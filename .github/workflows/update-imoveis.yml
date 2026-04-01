@@ -1,0 +1,54 @@
+name: Atualizar lista de imóveis
+
+on:
+  schedule:
+    - cron: '0 */6 * * *'
+  workflow_dispatch:
+
+jobs:
+  update:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - name: Checkout repo
+        uses: actions/checkout@v4
+
+      - name: Download CSV da Google Sheet
+        run: |
+          curl -sL "https://docs.google.com/spreadsheets/d/1nluj2-XA_mZmPtIFeOClq9bBoiGb8Xvv5AiDdbfvUCY/export?format=csv&gid=297881793" -o properties.csv
+
+      - name: Gerar HTML
+        run: |
+          python3 << 'EOF'
+          import csv, html
+          from datetime import datetime, timezone, timedelta
+          rows = []
+          with open("properties.csv", "r", encoding="utf-8") as f:
+              reader = csv.DictReader(f)
+              for row in reader:
+                  rows.append(row)
+          now = datetime.now(timezone(timedelta(hours=1))).strftime("%Y-%m-%d %H:%M")
+          h = f"""<!DOCTYPE html>
+          <html lang="pt"><head><meta charset="UTF-8">
+          <title>Patrimonius - Imóveis</title>
+          <style>body{{font-family:Arial,sans-serif;margin:20px}}h1{{color:#2c3e50}}.update{{color:#7f8c8d;font-size:.9em;margin-bottom:20px}}.property{{border:1px solid #ddd;padding:15px;margin:10px 0;border-radius:5px}}.property h2{{margin:0 0 8px;font-size:1.1em;color:#2c3e50}}.property p{{margin:4px 0;color:#555}}.ref{{font-weight:bold;color:#e67e22}}.price{{font-weight:bold;color:#27ae60;font-size:1.1em}}a{{color:#2980b9}}</style>
+          </head><body>
+          <h1>Patrimonius - Imóveis Disponíveis</h1>
+          <p class="update">Atualizado: {now} | Total: {len(rows)} imóveis</p>"""
+          for r in rows:
+              h += f'<div class="property"><h2>{html.escape(r.get("Title",""))}</h2><p>Ref: <span class="ref">{html.escape(r.get("Reference",""))}</span></p><p>Local: {html.escape(r.get("Location",""))}</p><p>Preço: <span class="price">{html.escape(r.get("Price",""))}</span></p><p>Tipo: {html.escape(r.get("Type",""))}</p><p><a href="{html.escape(r.get("URL",""))}" target="_blank">Ver detalhes</a></p></div>'
+          h += "</body></html>"
+          with open("index.html", "w", encoding="utf-8") as f:
+              f.write(h)
+          print(f"Gerado {len(rows)} imóveis")
+          EOF
+
+      - name: Commit e push
+        run: |
+          git config user.name "GitHub Action"
+          git config user.email "action@github.com"
+          git add index.html
+          git diff --cached --quiet || git commit -m "Auto-update imóveis $(date '+%Y-%m-%d %H:%M UTC')"
+          git push
