@@ -38,7 +38,8 @@ jobs:
           <h1>Patrimonius - Imóveis Disponíveis</h1>
           <p class="update">Atualizado: {now} | Total: {len(rows)} imóveis</p>"""
           for r in rows:
-              h += f'<div class="property"><h2>{html.escape(r.get("Title",""))}</h2><p>Ref: <span class="ref">{html.escape(r.get("Reference",""))}</span></p><p>Local: {html.escape(r.get("Location",""))}</p><p>Preço: <span class="price">{html.escape(r.get("Price",""))}</span></p><p>Tipo: {html.escape(r.get("Type",""))}</p><p><a href="{html.escape(r.get("URL",""))}" target="_blank">Ver detalhes</a></p></div>'
+              url = html.escape(r.get("URL",""))
+              h += f'<div class="property"><h2>{html.escape(r.get("Title",""))}</h2><p>Ref: <span class="ref">{html.escape(r.get("Reference",""))}</span></p><p>Local: {html.escape(r.get("Location",""))}</p><p>Preço: <span class="price">{html.escape(r.get("Price",""))}</span></p><p>Tipo: {html.escape(r.get("Type",""))}</p><p>Link: <a href="{url}">{url}</a></p></div>'
           h += "</body></html>"
           with open("index.html", "w", encoding="utf-8") as f:
               f.write(h)
