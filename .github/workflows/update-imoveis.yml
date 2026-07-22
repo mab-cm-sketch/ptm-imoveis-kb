@@ -18,7 +18,7 @@ jobs:
 
       - name: Download CSV da Google Sheet
         run: |
-          curl -sL "https://docs.google.com/spreadsheets/d/1nluj2-XA_mZmPtIFeOClq9bBoiGb8Xvv5AiDdbfvUCY/export?format=csv&gid=297881793" -o properties.csv
+          curl -sL "https://docs.google.com/spreadsheets/d/1DQhWdXrLv_iilAvck9W1cJXeUIwNhQuiuu5WPpefT8c/export?format=csv" -o properties.csv
 
       - name: Gerar HTML
         run: |
