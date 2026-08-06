@@ -70,8 +70,8 @@ jobs:
               parts = [x.strip() for x in (loc or "").split(">") if x.strip()]
               if not parts:
                   return ""
-              if len(parts) == 1 or parts[0] == parts[-1]:
-                  return parts[0]
+              if len(parts) == 1 or parts[0] == parts[-1] or parts[0] in parts[-1]:
+                  return parts[-1]
               return f"{parts[-1]}, concelho de {parts[0]}"
 
           index_cards = []
@@ -100,21 +100,24 @@ jobs:
               e = html.escape
               # A referencia aparece no title, no h1 e em varias formas no corpo.
               # E o que torna o codigo recuperavel pela pesquisa da knowledge base.
+              # A ficha e um REDIRECCIONADOR permanente: a referencia e o URL.
+              # O bot nao precisa de procurar nada, so de compor .../imoveis/<REF>.html
+              redirect = f'<meta http-equiv="refresh" content="0;url={e(url)}">' if url else ""
+              destino = (f'<p>A redirecionar para o anúncio de {e(ref)}…</p>'
+                         f'<p><a href="{e(url)}">Se não for automático, clique aqui.</a></p>') if url else (
+                         f'<p>O anúncio da referência {e(ref)} não está disponível online neste momento.</p>'
+                         f'<p>Contacte a Patrimonius: (+351) 262 877 503</p>')
+
               page = f"""<!DOCTYPE html>
           <html lang="pt"><head><meta charset="UTF-8">
+          {redirect}
           <title>{e(ref)} - {e(title)} | Patrimonius</title>
           <meta name="description" content="Imóvel Patrimonius com a referência {e(ref)}: {e(title)}, {e(local)}. Preço {e(price)}.">
           <style>{CSS}</style>
           </head><body>
           <h1>{e(ref)} - {e(title)}</h1>
-          <p>Referência: <span class="ref">{e(ref)}</span></p>
-          <p>Este imóvel da Patrimonius tem a referência {e(ref)}. Também é procurado como
-          {e(', '.join(variantes))}.</p>
-          <p>Título: {e(title)}</p>
-          <p>Local: {e(local)}</p>
-          <p>Preço: <span class="price">{e(price)}</span></p>
-          <p>Tipo: {e(tipo)}</p>
-          <p>Link direto do anúncio ({e(ref)}): <a href="{e(url)}">{e(url)}</a></p>
+          <p>Referência: <span class="ref">{e(ref)}</span> · {e(local)} · <span class="price">{e(price)}</span> · {e(tipo)}</p>
+          {destino}
           <hr>
           <p><a href="../index.html">Todos os imóveis Patrimonius</a></p>
           </body></html>"""
@@ -147,7 +150,22 @@ jobs:
           with open("index.html", "w", encoding="utf-8") as f:
               f.write(index)
 
-          print(f"Gerado index.html + {len(rows)} fichas em imoveis/")
+          # 404: uma referencia que nao exista aterra aqui, em vez de dar erro cru
+          nao_encontrado = f"""<!DOCTYPE html>
+          <html lang="pt"><head><meta charset="UTF-8">
+          <title>Referência não encontrada | Patrimonius</title>
+          <style>{CSS}</style>
+          </head><body>
+          <h1>Referência não encontrada</h1>
+          <p>Não encontrámos nenhum imóvel com essa referência na lista da Patrimonius.
+          Pode ter havido um erro no código, ou o imóvel pode ter saído do mercado.</p>
+          <p>Contacte-nos: (+351) 262 877 503 · <a href="https://www.patrimonius.pt">patrimonius.pt</a></p>
+          <p><a href="/ptm-imoveis-kb/index.html">Ver todos os imóveis disponíveis</a></p>
+          </body></html>"""
+          with open("404.html", "w", encoding="utf-8") as f:
+              f.write(nao_encontrado)
+
+          print(f"Gerado index.html + 404.html + {len(rows)} fichas em imoveis/")
           EOF
 
       - name: Commit e push
@@ -155,7 +173,7 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add -A index.html imoveis
+          git add -A index.html 404.html imoveis
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
