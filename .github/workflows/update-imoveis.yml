@@ -5,23 +5,16 @@ on:
     - cron: '0 */6 * * *'
   workflow_dispatch:
 
+# So precisa de escrever no repositorio. A publicacao e feita pelo proprio
+# GitHub Pages, configurado em Settings > Pages como "Deploy from a branch"
+# (main / root): qualquer commit neste repositorio publica o site.
+# Nao ha workflow de deploy, logo nao ha grupo de concorrencia nem corridas.
 permissions:
   contents: write
-  pages: write
-  id-token: write
-
-# Este workflow gera E publica. Ganha sempre a corrida contra qualquer outro
-# deploy em curso, para nunca mais ficar preso em "Deployment cancelled".
-concurrency:
-  group: "pages"
-  cancel-in-progress: true
 
 jobs:
   update:
     runs-on: ubuntu-latest
-    environment:
-      name: github-pages
-      url: ${{ steps.deployment.outputs.page_url }}
 
     steps:
       - name: Checkout repo
@@ -181,15 +174,3 @@ jobs:
             git push
             echo "changed=true" >> $GITHUB_OUTPUT
           fi
-
-      - name: Configurar GitHub Pages
-        uses: actions/configure-pages@v5
-
-      - name: Carregar artefacto
-        uses: actions/upload-pages-artifact@v3
-        with:
-          path: '.'
-
-      - name: Publicar no GitHub Pages
-        id: deployment
-        uses: actions/deploy-pages@v4
