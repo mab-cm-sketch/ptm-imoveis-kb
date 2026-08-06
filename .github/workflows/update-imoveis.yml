@@ -23,28 +23,120 @@ jobs:
       - name: Gerar HTML
         run: |
           python3 << 'EOF'
-          import csv, html
+          import csv, html, os, re, shutil
           from datetime import datetime, timezone, timedelta
+
           rows = []
           with open("properties.csv", "r", encoding="utf-8") as f:
-              reader = csv.DictReader(f)
-              for row in reader:
-                  rows.append(row)
+              for row in csv.DictReader(f):
+                  if (row.get("Reference") or "").strip():
+                      rows.append(row)
+
           now = datetime.now(timezone(timedelta(hours=1))).strftime("%Y-%m-%d %H:%M")
-          h = f"""<!DOCTYPE html>
+
+          CSS = ("body{font-family:Arial,sans-serif;margin:20px;max-width:820px}"
+                 "h1{color:#2c3e50}h2{color:#2c3e50;font-size:1.15em}"
+                 ".update{color:#7f8c8d;font-size:.9em;margin-bottom:20px}"
+                 ".property{border:1px solid #ddd;padding:15px;margin:10px 0;border-radius:5px}"
+                 ".property h2{margin:0 0 8px;font-size:1.1em}"
+                 ".property p{margin:4px 0;color:#555}"
+                 ".ref{font-weight:bold;color:#e67e22}"
+                 ".price{font-weight:bold;color:#27ae60;font-size:1.1em}a{color:#2980b9}")
+
+          # pasta limpa para as paginas individuais
+          if os.path.isdir("imoveis"):
+              shutil.rmtree("imoveis")
+          os.makedirs("imoveis", exist_ok=True)
+
+          def clean_price(p):
+              p = (p or "").strip()
+              if not p:
+                  return "Sob consulta"
+              return p if "€" in p else p + " €"
+
+          def clean_local(loc):
+              # "Aljustrel > Aljustrel" -> "Aljustrel"; "A > B" -> "B (concelho de A)"
+              parts = [x.strip() for x in (loc or "").split(">") if x.strip()]
+              if not parts:
+                  return ""
+              if len(parts) == 1 or parts[0] == parts[-1]:
+                  return parts[0]
+              return f"{parts[-1]}, concelho de {parts[0]}"
+
+          index_cards = []
+
+          for r in rows:
+              ref = (r.get("Reference") or "").strip()
+              title = (r.get("Title") or "").strip()
+              local = clean_local(r.get("Location"))
+              price = clean_price(r.get("Price"))
+              tipo = (r.get("Type") or "").strip()
+              url = (r.get("URL") or "").strip()
+
+              slug = re.sub(r"[^A-Za-z0-9-]", "", ref) or "sem-ref"
+              tail = ref.split("-")[-1].strip()        # PT03Q-0706 -> 0706 ; PT03I-0682A -> 0682A
+              digits = re.sub(r"\D", "", tail)         # 0706
+              short = digits.lstrip("0") or digits     # 706
+
+              # variantes de escrita da referencia, sem repeticoes
+              variantes, _vistos = [], set()
+              for v in (ref, f"ref {ref}", f"referencia {ref}", tail, f"ref {tail}",
+                        digits, f"ref {digits}", f"ref. {short}", f"código {ref}", f"imóvel {ref}"):
+                  if v and v not in _vistos:
+                      _vistos.add(v)
+                      variantes.append(v)
+
+              e = html.escape
+              # A referencia aparece no title, no h1 e em varias formas no corpo.
+              # E o que torna o codigo recuperavel pela pesquisa da knowledge base.
+              page = f"""<!DOCTYPE html>
           <html lang="pt"><head><meta charset="UTF-8">
-          <title>Patrimonius - Imóveis</title>
-          <style>body{{font-family:Arial,sans-serif;margin:20px}}h1{{color:#2c3e50}}.update{{color:#7f8c8d;font-size:.9em;margin-bottom:20px}}.property{{border:1px solid #ddd;padding:15px;margin:10px 0;border-radius:5px}}.property h2{{margin:0 0 8px;font-size:1.1em;color:#2c3e50}}.property p{{margin:4px 0;color:#555}}.ref{{font-weight:bold;color:#e67e22}}.price{{font-weight:bold;color:#27ae60;font-size:1.1em}}a{{color:#2980b9}}</style>
+          <title>{e(ref)} - {e(title)} | Patrimonius</title>
+          <meta name="description" content="Imóvel Patrimonius com a referência {e(ref)}: {e(title)}, {e(local)}. Preço {e(price)}.">
+          <style>{CSS}</style>
+          </head><body>
+          <h1>{e(ref)} - {e(title)}</h1>
+          <p>Referência: <span class="ref">{e(ref)}</span></p>
+          <p>Este imóvel da Patrimonius tem a referência {e(ref)}. Também é procurado como
+          {e(', '.join(variantes))}.</p>
+          <p>Título: {e(title)}</p>
+          <p>Local: {e(local)}</p>
+          <p>Preço: <span class="price">{e(price)}</span></p>
+          <p>Tipo: {e(tipo)}</p>
+          <p>Link direto do anúncio ({e(ref)}): <a href="{e(url)}">{e(url)}</a></p>
+          <hr>
+          <p><a href="../index.html">Todos os imóveis Patrimonius</a></p>
+          </body></html>"""
+
+              with open(os.path.join("imoveis", slug + ".html"), "w", encoding="utf-8") as f:
+                  f.write(page)
+
+              index_cards.append(
+                  f'<div class="property"><h2><a href="imoveis/{e(slug)}.html">{e(ref)} - {e(title)}</a></h2>'
+                  f'<p>Ref: <span class="ref">{e(ref)}</span></p>'
+                  f'<p>Local: {e(local)}</p>'
+                  f'<p>Preço: <span class="price">{e(price)}</span></p>'
+                  f'<p>Tipo: {e(tipo)}</p>'
+                  f'<p>Link: <a href="{e(url)}">{e(url)}</a></p>'
+                  f'<p>Ficha completa da referência {e(ref)}: '
+                  f'<a href="imoveis/{e(slug)}.html">imoveis/{e(slug)}.html</a></p></div>'
+              )
+
+          index = f"""<!DOCTYPE html>
+          <html lang="pt"><head><meta charset="UTF-8">
+          <title>Patrimonius - Imóveis Disponíveis</title>
+          <style>{CSS}</style>
           </head><body>
           <h1>Patrimonius - Imóveis Disponíveis</h1>
-          <p class="update">Atualizado: {now} | Total: {len(rows)} imóveis</p>"""
-          for r in rows:
-              url = html.escape(r.get("URL",""))
-              h += f'<div class="property"><h2>{html.escape(r.get("Title",""))}</h2><p>Ref: <span class="ref">{html.escape(r.get("Reference",""))}</span></p><p>Local: {html.escape(r.get("Location",""))}</p><p>Preço: <span class="price">{html.escape(r.get("Price",""))}</span></p><p>Tipo: {html.escape(r.get("Type",""))}</p><p>Link: <a href="{url}">{url}</a></p></div>'
-          h += "</body></html>"
+          <p class="update">Atualizado: {now} | Total: {len(rows)} imóveis</p>
+          <p>Cada imóvel tem uma ficha própria, acessível pela sua referência.</p>
+          {''.join(index_cards)}
+          </body></html>"""
+
           with open("index.html", "w", encoding="utf-8") as f:
-              f.write(h)
-          print(f"Gerado {len(rows)} imóveis")
+              f.write(index)
+
+          print(f"Gerado index.html + {len(rows)} fichas em imoveis/")
           EOF
 
       - name: Commit e push
@@ -52,7 +144,7 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add index.html
+          git add -A index.html imoveis
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
