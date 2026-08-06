@@ -1,12 +1,15 @@
-# Simple workflow for deploying static content to GitHub Pages
+# Deploy manual do conteudo estatico para o GitHub Pages.
+#
+# ATENCAO: este workflow NAO corre em push, de proposito.
+# O deploy automatico e feito pelo workflow "Atualizar lista de imoveis"
+# (update-imoveis.yml), que gera as fichas E publica no mesmo run.
+# Quando os dois disparavam ao mesmo tempo, colidiam no grupo de concorrencia
+# "pages" e um deles morria com "Deployment cancelled" (06/08/2026).
+# Este fica so como recurso manual.
 name: Deploy static content to Pages
 
 on:
-  # Runs on pushes targeting the default branch
-  push:
-    branches: ["main"]
-
-  # Allows you to run this workflow manually from the Actions tab
+  # Apenas manual, a partir do separador Actions.
   workflow_dispatch:
 
 # Sets permissions of the GITHUB_TOKEN to allow deployment to GitHub Pages
