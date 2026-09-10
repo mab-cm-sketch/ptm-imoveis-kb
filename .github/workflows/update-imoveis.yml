@@ -67,6 +67,25 @@ jobs:
                   return parts[-1]
               return f"{parts[-1]}, concelho de {parts[0]}"
 
+          def extrai_area(title):
+              # A area vive no titulo do imovel, escrito a mao. So se extrai quando
+              # o padrao e inequivoco; caso contrario fica vazio, para o bot dizer
+              # que nao tem a informacao em vez de inventar um numero.
+              t = title or ""
+              m = re.search(r"(\d{1,4}(?:[.,]\d{1,2})?)\s*(?:ha\b|hectares?\b)", t, re.I)
+              if m:
+                  return m.group(1).replace(".", ",") + " ha"
+              m = re.search(r"(\d{1,3}(?:[.\s]?\d{3})*|\d+)\s*(?:m2\b|m\u00b2)", t, re.I)
+              if m:
+                  return m.group(1).replace(" ", ".") + " m\u00b2"
+              return ""
+
+          def extrai_tipologia(title):
+              m = re.search(r"\bT\s?(\d)(\s*\+\s*(\d))?\b", title or "", re.I)
+              if not m:
+                  return ""
+              return "T%s+%s" % (m.group(1), m.group(3)) if m.group(3) else "T" + m.group(1)
+
           index_cards = []
 
           for r in rows:
@@ -76,6 +95,8 @@ jobs:
               price = clean_price(r.get("Price"))
               tipo = (r.get("Type") or "").strip()
               url = (r.get("URL") or "").strip()
+              area = extrai_area(title)
+              tipol = extrai_tipologia(title)
 
               slug = re.sub(r"[^A-Za-z0-9-]", "", ref) or "sem-ref"
               tail = ref.split("-")[-1].strip()        # PT03Q-0706 -> 0706 ; PT03I-0682A -> 0682A
@@ -91,6 +112,12 @@ jobs:
                       variantes.append(v)
 
               e = html.escape
+              extras = []
+              if area:
+                  extras.append(f"\u00c1rea: {e(area)}")
+              if tipol:
+                  extras.append(f"Tipologia: {e(tipol)}")
+              linha_extras = ("<p>" + " \u00b7 ".join(extras) + "</p>") if extras else ""
               # A referencia aparece no title, no h1 e em varias formas no corpo.
               # E o que torna o codigo recuperavel pela pesquisa da knowledge base.
               # A ficha e um REDIRECCIONADOR permanente: a referencia e o URL.
@@ -110,6 +137,7 @@ jobs:
           </head><body>
           <h1>{e(ref)} - {e(title)}</h1>
           <p>Referência: <span class="ref">{e(ref)}</span> · {e(local)} · <span class="price">{e(price)}</span> · {e(tipo)}</p>
+          {linha_extras}
           {destino}
           <hr>
           <p><a href="../index.html">Todos os imóveis Patrimonius</a></p>
@@ -124,6 +152,7 @@ jobs:
                   f'<p>Local: {e(local)}</p>'
                   f'<p>Preço: <span class="price">{e(price)}</span></p>'
                   f'<p>Tipo: {e(tipo)}</p>'
+                  + linha_extras +
                   f'<p>Link: <a href="{e(url)}">{e(url)}</a></p>'
                   f'<p>Ficha completa da referência {e(ref)}: '
                   f'<a href="imoveis/{e(slug)}.html">imoveis/{e(slug)}.html</a></p></div>'
