@@ -122,7 +122,7 @@ jobs:
               # E o que torna o codigo recuperavel pela pesquisa da knowledge base.
               # A ficha e um REDIRECCIONADOR permanente: a referencia e o URL.
               # O bot nao precisa de procurar nada, so de compor .../imoveis/<REF>.html
-              redirect = f'<meta http-equiv="refresh" content="0;url={e(url)}">' if url else ""
+              redirect = ""  # NAO repor: o rastreador do GHL seguia-o e indexava o anuncio, nao a ficha
               destino = (f'<p>A redirecionar para o anúncio de {e(ref)}…</p>'
                          f'<p><a href="{e(url)}">Se não for automático, clique aqui.</a></p>') if url else (
                          f'<p>O anúncio da referência {e(ref)} não está disponível online neste momento.</p>'
