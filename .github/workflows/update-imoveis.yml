@@ -171,6 +171,16 @@ jobs:
 
           with open("index.html", "w", encoding="utf-8") as f:
               f.write(index)
+          # sitemap.xml: e o que permite ao rastreador do GHL descobrir sozinho as
+          # fichas individuais. Sem ele o rastreador so treina a pagina que lhe
+          # derem, e um imovel novo fica invisivel para a knowledge base.
+          BASE = "https://mab-cm-sketch.github.io/ptm-imoveis-kb/"
+          hoje = datetime.now(timezone(timedelta(hours=1))).strftime("%Y-%m-%d")
+          urls = [BASE] + [f"{BASE}imoveis/{re.sub(r'[^A-Za-z0-9-]', '', (r.get('Reference') or '').strip()) or 'sem-ref'}.html" for r in rows]
+          linhas = [f"  <url><loc>{html.escape(u)}</loc><lastmod>{hoje}</lastmod></url>" for u in urls]
+          sitemap = chr(10).join(['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'] + linhas + ['</urlset>', ''])
+          with open("sitemap.xml", "w", encoding="utf-8") as f:
+              f.write(sitemap)
 
           # 404: uma referencia que nao exista aterra aqui, em vez de dar erro cru
           nao_encontrado = f"""<!DOCTYPE html>
@@ -195,7 +205,7 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add -A index.html 404.html imoveis
+          git add -A index.html 404.html imoveis sitemap.xml
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
