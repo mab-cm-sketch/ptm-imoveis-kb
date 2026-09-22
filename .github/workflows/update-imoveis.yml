@@ -126,13 +126,13 @@ jobs:
               destino = (f'<p>A redirecionar para o anúncio de {e(ref)}…</p>'
                          f'<p><a href="{e(url)}">Se não for automático, clique aqui.</a></p>') if url else (
                          f'<p>O anúncio da referência {e(ref)} não está disponível online neste momento.</p>'
-                         f'<p>Contacte a Patrimonius: (+351) 262 877 503</p>')
+                         f'<p>Contacte a Stop And Buy: (+351) 262 877 503</p>')
 
               page = f"""<!DOCTYPE html>
           <html lang="pt"><head><meta charset="UTF-8">
           {redirect}
-          <title>{e(ref)} - {e(title)} | Patrimonius</title>
-          <meta name="description" content="Imóvel Patrimonius com a referência {e(ref)}: {e(title)}, {e(local)}. Preço {e(price)}.">
+          <title>{e(ref)} - {e(title)} | Stop And Buy</title>
+          <meta name="description" content="Imóvel Stop And Buy com a referência {e(ref)}: {e(title)}, {e(local)}. Preço {e(price)}.">
           <style>{CSS}</style>
           </head><body>
           <h1>{e(ref)} - {e(title)}</h1>
@@ -140,7 +140,7 @@ jobs:
           {linha_extras}
           {destino}
           <hr>
-          <p><a href="../index.html">Todos os imóveis Patrimonius</a></p>
+          <p><a href="../index.html">Todos os imóveis Stop And Buy</a></p>
           </body></html>"""
 
               with open(os.path.join("imoveis", slug + ".html"), "w", encoding="utf-8") as f:
@@ -160,10 +160,10 @@ jobs:
 
           index = f"""<!DOCTYPE html>
           <html lang="pt"><head><meta charset="UTF-8">
-          <title>Patrimonius - Imóveis Disponíveis</title>
+          <title>Stop And Buy - Imóveis Disponíveis</title>
           <style>{CSS}</style>
           </head><body>
-          <h1>Patrimonius - Imóveis Disponíveis</h1>
+          <h1>Stop And Buy - Imóveis Disponíveis</h1>
           <p class="update">Atualizado: {now} | Total: {len(rows)} imóveis</p>
           <p>Cada imóvel tem uma ficha própria, acessível pela sua referência.</p>
           {''.join(index_cards)}
@@ -185,13 +185,13 @@ jobs:
           # 404: uma referencia que nao exista aterra aqui, em vez de dar erro cru
           nao_encontrado = f"""<!DOCTYPE html>
           <html lang="pt"><head><meta charset="UTF-8">
-          <title>Referência não encontrada | Patrimonius</title>
+          <title>Referência não encontrada | Stop And Buy</title>
           <style>{CSS}</style>
           </head><body>
           <h1>Referência não encontrada</h1>
-          <p>Não encontrámos nenhum imóvel com essa referência na lista da Patrimonius.
+          <p>Não encontrámos nenhum imóvel com essa referência na lista da Stop And Buy.
           Pode ter havido um erro no código, ou o imóvel pode ter saído do mercado.</p>
-          <p>Contacte-nos: (+351) 262 877 503 · <a href="https://www.patrimonius.pt">patrimonius.pt</a></p>
+          <p>Contacte-nos: (+351) 262 877 503 · <a href="https://www.stopandbuy.pt">stopandbuy.pt</a></p>
           <p><a href="/ptm-imoveis-kb/index.html">Ver todos os imóveis disponíveis</a></p>
           </body></html>"""
           with open("404.html", "w", encoding="utf-8") as f:
