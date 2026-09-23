@@ -123,8 +123,8 @@ jobs:
               # A ficha e um REDIRECCIONADOR permanente: a referencia e o URL.
               # O bot nao precisa de procurar nada, so de compor .../imoveis/<REF>.html
               redirect = ""  # NAO repor: o rastreador do GHL seguia-o e indexava o anuncio, nao a ficha
-              destino = (f'<p>A redirecionar para o anúncio de {e(ref)}…</p>'
-                         f'<p><a href="{e(url)}">Se não for automático, clique aqui.</a></p>') if url else (
+              destino = (f'<p>Link:</p>'
+                         f'<p><a href="{e(url)}">{e(url)}</a></p>') if url else (
                          f'<p>O anúncio da referência {e(ref)} não está disponível online neste momento.</p>'
                          f'<p>Contacte a Stop And Buy: (+351) 269 633 106</p>')
 
