@@ -286,6 +286,32 @@ jobs:
               intro = f"Todos os imóveis da Stop And Buy no concelho de {conc}, do mais barato para o mais caro."
               paginas.append(pagina(f"concelho-{slugify(conc)}.html", titulo, intro, itens))
 
+          # Paginas PERTO DE: um lead que diz "perto de Sines" quer tambem Sao Luis
+          # (Odemira) e Vale de Agua (Santiago do Cacem). A pesquisa por semelhanca
+          # devolvia so a pagina do concelho de Sines e o bot concluia que nao havia
+          # nada. Cada pagina junta o concelho e os concelhos vizinhos, por preco.
+          VIZINHOS = {
+              "Sines": ["Santiago do Cacém", "Odemira"],
+              "Santiago do Cacém": ["Sines", "Grândola", "Odemira", "Ourique", "Aljustrel"],
+              "Odemira": ["Sines", "Santiago do Cacém", "Ourique"],
+              "Grândola": ["Santiago do Cacém", "Sines"],
+              "Ourique": ["Odemira", "Santiago do Cacém", "Aljustrel", "Almodôvar"],
+              "Aljustrel": ["Santiago do Cacém", "Ourique"],
+              "Almodôvar": ["Ourique"],
+          }
+          for conc, viz in VIZINHOS.items():
+              zona = [conc] + viz
+              itens = [c for c in com_preco if c["conc"] in zona]
+              if not itens:
+                  continue
+              locs = sorted({(c["local"] or "").split(",")[0].split(">")[-1].strip()
+                             for c in itens if c["conc"] in zona and c["local"]} - {""})
+              titulo = f"Imóveis à venda perto de {conc} — {conc} e concelhos vizinhos ({', '.join(viz)})"
+              intro = (f"Para quem procura imóveis perto de {conc}, nos arredores de {conc} ou na zona de {conc}: "
+                       f"todos os imóveis da Stop And Buy no concelho de {conc} e nos concelhos vizinhos "
+                       f"{', '.join(viz)}, do mais barato para o mais caro. Localidades: {', '.join(locs)}.")
+              paginas.append(pagina(f"perto-de-{slugify(conc)}.html", titulo, intro, itens))
+
           litoral = [c for c in com_preco if c["reg"] == LITORAL]
           paginas.append(pagina("regiao-alentejo-litoral.html",
                                 f"Imóveis à venda no {LITORAL}",
