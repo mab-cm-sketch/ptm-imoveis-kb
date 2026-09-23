@@ -86,6 +86,50 @@ jobs:
                   return ""
               return "T%s+%s" % (m.group(1), m.group(3)) if m.group(3) else "T" + m.group(1)
 
+          # Freguesia/localidade -> concelho. A folha so traz a localidade em muitas linhas,
+          # e sem concelho nem regiao a pesquisa por zona ("Costa Alentejana", "perto de
+          # Sines") nao encontra nada. Localidade nova sem mapa fica com o concelho vazio.
+          CONCELHOS = {
+              "santiago do cacém": "Santiago do Cacém",
+              "santiago do cacém, s.cruz e s.bartolomeu da serra": "Santiago do Cacém",
+              "são francisco da serra": "Santiago do Cacém", "são domingos e vale de água": "Santiago do Cacém",
+              "vale de água": "Santiago do Cacém", "cercal": "Santiago do Cacém", "abela": "Santiago do Cacém",
+              "santo andré": "Santiago do Cacém", "sines": "Sines", "porto covo": "Sines",
+              "são luís": "Odemira", "são teotónio": "Odemira", "colos": "Odemira",
+              "vila nova de milfontes": "Odemira", "odemira": "Odemira",
+              "grândola e santa margarida da serra": "Grândola", "grândola": "Grândola",
+              "ourique": "Ourique", "aljustrel": "Aljustrel", "messejana": "Aljustrel",
+              "santa cruz": "Almodôvar", "almodôvar": "Almodôvar",
+              "mexilhoeira grande": "Portimão", "portimão": "Portimão",
+          }
+          LITORAL = "Alentejo Litoral (Costa Alentejana)"
+          REGIOES = {
+              "Santiago do Cacém": LITORAL, "Sines": LITORAL, "Odemira": LITORAL, "Grândola": LITORAL,
+              "Aljustrel": "Baixo Alentejo (interior)", "Ourique": "Baixo Alentejo (interior)",
+              "Almodôvar": "Baixo Alentejo (interior)", "Portimão": "Algarve",
+          }
+
+          def concelho_regiao(loc):
+              parts = [x.strip() for x in (loc or "").split(">") if x.strip()]
+              if not parts:
+                  return "", ""
+              conc = CONCELHOS.get(parts[0].lower(), "") if len(parts) > 1 else ""
+              conc = conc or CONCELHOS.get(parts[-1].lower(), "")
+              return conc, REGIOES.get(conc, "")
+
+          def preco_num(p):
+              d = re.sub(r"\D", "", p or "")
+              return int(d) if d else None
+
+          def slugify(t):
+              t = t.lower()
+              for a, b in (("áàâã", "a"), ("éê", "e"), ("í", "i"), ("óôõ", "o"), ("ú", "u"), ("ç", "c")):
+                  for ch in a:
+                      t = t.replace(ch, b)
+              return re.sub(r"[^a-z0-9]+", "-", t).strip("-")
+
+          catalogo = []
+
           index_cards = []
 
           for r in rows:
@@ -97,6 +141,7 @@ jobs:
               url = (r.get("URL") or "").strip()
               area = extrai_area(title)
               tipol = extrai_tipologia(title)
+              conc, reg = concelho_regiao(r.get("Location"))
 
               slug = re.sub(r"[^A-Za-z0-9-]", "", ref) or "sem-ref"
               tail = ref.split("-")[-1].strip()        # PT03Q-0706 -> 0706 ; PT03I-0682A -> 0682A
@@ -117,6 +162,10 @@ jobs:
                   extras.append(f"\u00c1rea: {e(area)}")
               if tipol:
                   extras.append(f"Tipologia: {e(tipol)}")
+              if conc:
+                  extras.append(f"Concelho: {e(conc)}")
+              if reg:
+                  extras.append(f"Região: {e(reg)}")
               linha_extras = ("<p>" + " \u00b7 ".join(extras) + "</p>") if extras else ""
               # A referencia aparece no title, no h1 e em varias formas no corpo.
               # E o que torna o codigo recuperavel pela pesquisa da knowledge base.
@@ -146,6 +195,9 @@ jobs:
               with open(os.path.join("imoveis", slug + ".html"), "w", encoding="utf-8") as f:
                   f.write(page)
 
+              catalogo.append(dict(ref=ref, title=title, local=local, price=price, num=preco_num(price),
+                                   url=url, conc=conc, reg=reg, extras=" · ".join(extras)))
+
               index_cards.append(
                   f'<div class="property"><h2><a href="imoveis/{e(slug)}.html">{e(ref)} - {e(title)}</a></h2>'
                   f'<p>Ref: <span class="ref">{e(ref)}</span></p>'
@@ -171,12 +223,82 @@ jobs:
 
           with open("index.html", "w", encoding="utf-8") as f:
               f.write(index)
+          # Paginas de PESQUISA por orcamento e por concelho. A pesquisa da knowledge base
+          # e por semelhanca e devolve 5 blocos: uma pergunta "300 a 350 mil na Costa
+          # Alentejana" nunca encontra as fichas certas uma a uma. Uma pagina pequena por
+          # faixa de preco e por concelho da ao bot a lista inteira que responde ao criterio.
+          # Faixas SOBREPOSTAS de proposito: um orcamento perto do limite cai em duas.
+          if os.path.isdir("pesquisa"):
+              shutil.rmtree("pesquisa")
+          os.makedirs("pesquisa", exist_ok=True)
+          FAIXAS = [(0, 150000), (100000, 250000), (200000, 350000), (300000, 450000),
+                    (400000, 600000), (550000, 1000000), (900000, None)]
+
+          def eur(n):
+              return f"{n:,}".replace(",", ".") + " €"
+
+          def linha(c):
+              base = f"{c['ref']} — {c['title']} · {c['local']} · {c['price']}"
+              if c["extras"]:
+                  base += " · " + c["extras"]
+              return base + (f" · Link: {c['url']}" if c["url"] else " · sem anúncio online")
+
+          def pagina(nome, titulo, intro, itens):
+              e = html.escape
+              lis = "".join(f"<li>{e(linha(c))}</li>" for c in itens)
+              corpo = (f"<ul>{lis}</ul>" if itens else "<p>Neste momento não há imóveis nesta pesquisa.</p>")
+              doc = f"""<!DOCTYPE html>
+          <html lang="pt"><head><meta charset="UTF-8">
+          <title>{e(titulo)} | Stop And Buy</title>
+          <style>{CSS}</style>
+          </head><body>
+          <h1>{e(titulo)}</h1>
+          <p>{e(intro)} Total: {len(itens)} imóveis. Atualizado: {now}.</p>
+          {corpo}
+          <p><a href="../index.html">Todos os imóveis Stop And Buy</a></p>
+          </body></html>"""
+              with open(os.path.join("pesquisa", nome), "w", encoding="utf-8") as f:
+                  f.write(doc)
+              return "pesquisa/" + nome
+
+          com_preco = sorted([c for c in catalogo if c["num"]], key=lambda c: c["num"])
+          paginas = []
+          for lo, hi in FAIXAS:
+              itens = [c for c in com_preco if c["num"] >= lo and (hi is None or c["num"] <= hi)]
+              if hi is None:
+                  titulo = f"Imóveis à venda acima de {eur(lo)}"
+                  intro = f"Imóveis da Stop And Buy para um orçamento acima de {lo // 1000} mil euros, do mais barato para o mais caro."
+                  nome = f"preco-acima-de-{lo}.html"
+              else:
+                  titulo = f"Imóveis à venda entre {eur(lo)} e {eur(hi)}"
+                  intro = (f"Imóveis da Stop And Buy para um orçamento entre {lo // 1000} mil e {hi // 1000} mil euros, "
+                           f"do mais barato para o mais caro.")
+                  nome = f"preco-{lo}-{hi}.html"
+              paginas.append(pagina(nome, titulo, intro, itens))
+
+          por_conc = {}
+          for c in com_preco:
+              if c["conc"]:
+                  por_conc.setdefault(c["conc"], []).append(c)
+          for conc, itens in sorted(por_conc.items()):
+              reg = REGIOES.get(conc, "")
+              titulo = f"Imóveis à venda no concelho de {conc}" + (f" — {reg}" if reg else "")
+              intro = f"Todos os imóveis da Stop And Buy no concelho de {conc}, do mais barato para o mais caro."
+              paginas.append(pagina(f"concelho-{slugify(conc)}.html", titulo, intro, itens))
+
+          litoral = [c for c in com_preco if c["reg"] == LITORAL]
+          paginas.append(pagina("regiao-alentejo-litoral.html",
+                                f"Imóveis à venda no {LITORAL}",
+                                "Imóveis da Stop And Buy nos concelhos de Sines, Santiago do Cacém, Odemira e Grândola "
+                                "(Porto Covo, Vila Nova de Milfontes, Santo André, Cercal, São Luís, São Teotónio), "
+                                "do mais barato para o mais caro.", litoral))
+
           # sitemap.xml: e o que permite ao rastreador do GHL descobrir sozinho as
           # fichas individuais. Sem ele o rastreador so treina a pagina que lhe
           # derem, e um imovel novo fica invisivel para a knowledge base.
           BASE = "https://mab-cm-sketch.github.io/ptm-imoveis-kb/"
           hoje = datetime.now(timezone(timedelta(hours=1))).strftime("%Y-%m-%d")
-          urls = [BASE] + [f"{BASE}imoveis/{re.sub(r'[^A-Za-z0-9-]', '', (r.get('Reference') or '').strip()) or 'sem-ref'}.html" for r in rows]
+          urls = [BASE] + [f"{BASE}imoveis/{re.sub(r'[^A-Za-z0-9-]', '', (r.get('Reference') or '').strip()) or 'sem-ref'}.html" for r in rows] + [BASE + p for p in paginas]
           linhas = [f"  <url><loc>{html.escape(u)}</loc><lastmod>{hoje}</lastmod></url>" for u in urls]
           sitemap = chr(10).join(['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'] + linhas + ['</urlset>', ''])
           with open("sitemap.xml", "w", encoding="utf-8") as f:
@@ -197,7 +319,7 @@ jobs:
           with open("404.html", "w", encoding="utf-8") as f:
               f.write(nao_encontrado)
 
-          print(f"Gerado index.html + 404.html + {len(rows)} fichas em imoveis/")
+          print(f"Gerado index.html + 404.html + {len(rows)} fichas em imoveis/ + {len(paginas)} paginas em pesquisa/")
           EOF
 
       - name: Commit e push
@@ -205,7 +327,7 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add -A index.html 404.html imoveis sitemap.xml
+          git add -A index.html 404.html imoveis pesquisa sitemap.xml
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
