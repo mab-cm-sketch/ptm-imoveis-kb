@@ -31,10 +31,13 @@ jobs:
           from datetime import datetime, timezone, timedelta
 
           rows = []
+          ignoradas = []   # M-042: linhas com dados mas sem referencia ficam fora da lista
           with open("properties.csv", "r", encoding="utf-8") as f:
               for row in csv.DictReader(f):
                   if (row.get("Reference") or "").strip():
                       rows.append(row)
+                  elif any((row.get(k) or "").strip() for k in ("Title", "URL", "Price")):
+                      ignoradas.append(row)
 
           now = datetime.now(timezone(timedelta(hours=1))).strftime("%Y-%m-%d %H:%M")
 
@@ -210,13 +213,22 @@ jobs:
                   f'<a href="imoveis/{e(slug)}.html">imoveis/{e(slug)}.html</a></p></div>'
               )
 
+          # M-042: as linhas sem referencia vao para ignoradas.txt (lido todos os dias por um
+          # cenario Make que avisa o geral@) e o numero aparece no cabecalho do indice.
+          linhas_ign = [" · ".join([(r.get("Title") or "").strip() or "(sem titulo)",
+                                    clean_price(r.get("Price")),
+                                    (r.get("URL") or "").strip() or "(sem link)"]) for r in ignoradas]
+          with open("ignoradas.txt", "w", encoding="utf-8") as f:
+              f.write("".join(l + "\n" for l in linhas_ign))
+          aviso_ign = f" | Linhas da folha sem referência: {len(ignoradas)}" if ignoradas else ""
+
           index = f"""<!DOCTYPE html>
           <html lang="pt"><head><meta charset="UTF-8">
           <title>Stop And Buy - Imóveis Disponíveis</title>
           <style>{CSS}</style>
           </head><body>
           <h1>Stop And Buy - Imóveis Disponíveis</h1>
-          <p class="update">Atualizado: {now} | Total: {len(rows)} imóveis</p>
+          <p class="update">Atualizado: {now} | Total: {len(rows)} imóveis{aviso_ign}</p>
           <p>Cada imóvel tem uma ficha própria, acessível pela sua referência.</p>
           {''.join(index_cards)}
           </body></html>"""
@@ -353,7 +365,7 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add -A index.html 404.html imoveis pesquisa sitemap.xml
+          git add -A index.html 404.html imoveis pesquisa sitemap.xml ignoradas.txt
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
