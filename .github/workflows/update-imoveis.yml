@@ -15,14 +15,251 @@ permissions:
 jobs:
   update:
     runs-on: ubuntu-latest
+    timeout-minutes: 25
 
     steps:
       - name: Checkout repo
         uses: actions/checkout@v4
 
-      - name: Download CSV da Google Sheet
+      # 30/10/2026: a lista passa a vir do proprio site (www.stopandbuy.pt). A folha
+      # patrimonius_properties fica como BACKUP: e escrita a partir desta leitura (Make)
+      # e so e usada se a leitura do site falhar ou vier fraca (travoes em base_dados).
+      - name: Download CSV da Google Sheet (backup)
         run: |
-          curl -sL "https://docs.google.com/spreadsheets/d/1DQhWdXrLv_iilAvck9W1cJXeUIwNhQuiuu5WPpefT8c/export?format=csv&gid=320533870" -o properties.csv
+          curl -sL "https://docs.google.com/spreadsheets/d/1DQhWdXrLv_iilAvck9W1cJXeUIwNhQuiuu5WPpefT8c/export?format=csv&gid=320533870" -o folha.csv
+
+      - name: Instalar browser sem interface
+        continue-on-error: true
+        run: |
+          npm install --no-save --no-package-lock --silent playwright@1.48.2
+          npx playwright install --with-deps chromium
+
+      - name: Ler imoveis do site stopandbuy.pt
+        continue-on-error: true
+        timeout-minutes: 12
+        run: |
+          node - << 'EOF'
+          // Le todos os imoveis publicados em www.stopandbuy.pt (sitemap -> cada ficha num browser
+          // sem interface). A referencia, o concelho e o estado so aparecem depois do JavaScript da
+          // pagina correr; o preco, o titulo e o tipo de negocio vem do JSON-LD da propria ficha.
+          // Bloqueia imagens e scripts de terceiros (o widget do GHL criaria sessoes falsas na conta).
+          const { chromium } = require('playwright');
+          const fs = require('fs');
+          const UA = 'Mozilla/5.0 (X11; Linux x86_64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/126.0 Safari/537.36';
+          (async () => {
+            // O sitemap ja veio vazio uma vez (30/10, pedido isolado): tenta ate 3 vezes.
+            let urls = [];
+            for (let tent = 1; tent <= 3 && urls.length === 0; tent++) {
+              try {
+                const r = await fetch('https://www.stopandbuy.pt/sitemap-pt-pt.xml', { headers: { 'User-Agent': UA } });
+                const sm = await r.text();
+                urls = [...new Set([...sm.matchAll(/<loc>(https:\/\/www\.stopandbuy\.pt\/imovel\/[^<]+)<\/loc>/g)].map(m => m[1].trim()))];
+                console.log('sitemap, tentativa', tent, '- HTTP', r.status, '-', urls.length, 'fichas');
+              } catch (e) { console.log('sitemap, tentativa', tent, '- erro', e.message); }
+              if (urls.length === 0) await new Promise(res => setTimeout(res, 20000));
+            }
+            const b = await chromium.launch();
+            const ctx = await b.newContext({ userAgent: UA, locale: 'pt-PT' });
+            await ctx.route('**/*', r => {
+              const u = r.request().url(), t = r.request().resourceType();
+              const terceiros = /leadconnector|msgsndr|google|gstatic|facebook|doubleclick|hotjar|clarity|youtube|vimeo/.test(u);
+              return (['image', 'font', 'media'].includes(t) || terceiros) ? r.abort() : r.continue();
+            });
+            const out = [];
+            let i = 0;
+            async function ler(p, u) {
+              await p.goto(u, { waitUntil: 'domcontentloaded', timeout: 45000 });
+              await p.waitForFunction(() => /Refer[eê]ncia/.test(document.body.innerText), null, { timeout: 25000 });
+              return await p.evaluate(() => {
+                const t = document.body.innerText;
+                const i0 = t.search(/DETALHES DO IM[OÓ]VEL/i);
+                let det = i0 >= 0 ? t.slice(i0) : t;
+                const j = det.search(/CARACTER[IÍ]STICAS DO IM[OÓ]VEL|LOCALIZA[CÇ][AÃ]O DO IM[OÓ]VEL|PEDIDO DE CONTACTO/i);
+                if (j > 0) det = det.slice(0, j);
+                const campo = n => { const m = det.match(new RegExp(n + '[ \\t]*\\n?[ \\t]*([^\\n]+)')); return m ? m[1].trim() : ''; };
+                let ld = {};
+                for (const s of document.querySelectorAll('script[type="application/ld+json"]')) {
+                  try { const d = JSON.parse(s.textContent); if (d['@type'] === 'RealEstateListing') ld = d; } catch (e) {}
+                }
+                const of = ld.offers || {};
+                // Tipo de negocio: 1) linha de preco nos detalhes ("Venda 950 000 €"), 2) etiqueta
+                // "ARRENDAMENTO SOB CONSULTA" quando nao ha preco, 3) JSON-LD, 4) Venda por omissao.
+                const mDet = det.match(/(?:^|\n)\s*(Venda|Arrendamento)\b[ \t]*\n?[ \t]*[\d.\s\u00a0]+€/i);
+                const mSob = t.match(/\b(VENDA|ARRENDAMENTO)\s+SOB\s+CONSULTA\b/i);
+                const neg = mDet ? (/^arr/i.test(mDet[1]) ? 'Arrendamento' : 'Venda')
+                          : mSob ? (/^arr/i.test(mSob[1]) ? 'Arrendamento' : 'Venda')
+                          : /Lease|Rent/i.test(of.businessFunction || '') ? 'Arrendamento' : 'Venda';
+                return {
+                  ref: campo('Refer[eê]ncia'), distrito: campo('Distrito'), concelho: campo('Concelho'),
+                  freguesia: campo('Freguesia'), estado: campo('Estado'), natureza: campo('Natureza'),
+                  tipologia: campo('Tipologia'), titulo: ld.name || document.title, preco: Number(of.price) || 0,
+                  negocio: neg, lat: (ld.about || {}).latitude || '', lng: (ld.about || {}).longitude || ''
+                };
+              });
+            }
+            async function worker() {
+              const p = await ctx.newPage();
+              while (i < urls.length) {
+                const u = urls[i++];
+                const id = (u.match(/\/(\d+)\/?$/) || [])[1] || '';
+                let r = null, erro = '';
+                for (let tent = 0; tent < 2 && !r; tent++) {
+                  try { r = await ler(p, u); } catch (e) { erro = String(e.message || e).slice(0, 120); }
+                }
+                out.push(r ? { url: u, id, ok: true, ...r } : { url: u, id, ok: false, erro });
+              }
+              await p.close();
+            }
+            await Promise.all([worker(), worker(), worker()]);
+            await b.close();
+            fs.writeFileSync('site.json', JSON.stringify(out, null, 1));
+            console.log('lidas:', out.filter(x => x.ok).length, '| com referencia:', out.filter(x => x.ok && x.ref).length, '| erros:', out.filter(x => !x.ok).length);
+          })().catch(e => { console.error('falhou:', e); process.exit(1); });
+          EOF
+
+      - name: Base de dados e escolha da fonte
+        run: |
+          python3 << 'EOF'
+          # Junta a leitura do site a base de dados (dados/imoveis.json), decide a fonte e escreve
+          # properties.csv no MESMO formato da folha, para o gerador seguinte nao mudar.
+          # Travoes: se a leitura do site vier fraca, usa a folha (backup) e nao mexe na base.
+          import csv, html, json, os, shutil
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
+
+          agora = datetime.now(ZoneInfo("Europe/Lisbon"))
+          hoje, hora = agora.strftime("%Y-%m-%d"), agora.strftime("%Y-%m-%d %H:%M")
+          CAB = ["Property #", "Reference", "Title", "Location", "Price", "Type", "URL"]
+
+          site, motivo = [], ""
+          try:
+              with open("site.json", encoding="utf-8") as f:
+                  site = json.load(f)
+          except Exception as ex:
+              motivo = "a leitura do site nao produziu resultado (" + ex.__class__.__name__ + ")"
+          ant = {}
+          if os.path.exists("dados/imoveis.json"):
+              with open("dados/imoveis.json", encoding="utf-8") as f:
+                  ant = json.load(f)
+
+          lidos = [p for p in site if p.get("ok")]
+          com_ref = [p for p in lidos if (p.get("ref") or "").strip()]
+          vendas = [p for p in com_ref if p.get("negocio") == "Venda"]
+          n_ant = ant.get("total_venda") or 0
+          if not motivo:
+              if len(site) < 20:
+                  motivo = f"o sitemap do site so trouxe {len(site)} imoveis"
+              elif len(com_ref) < 0.9 * len(site):
+                  motivo = f"so {len(com_ref)} de {len(site)} fichas lidas com referencia"
+              elif n_ant and len(vendas) < 0.7 * n_ant:
+                  motivo = f"os imoveis a venda cairam de {n_ant} para {len(vendas)} numa leitura"
+
+
+          def aviso_do_dia(linhas):
+              # alteracoes_hoje.txt: o que mudou no dia (hora de Lisboa), acumulado entre corridas.
+              atual = []
+              if os.path.exists("alteracoes_hoje.txt"):
+                  with open("alteracoes_hoje.txt", encoding="utf-8") as f:
+                      atual = f.read().splitlines()
+              if not atual or atual[0] != "Data: " + hoje:
+                  atual = ["Data: " + hoje]
+              atual += linhas
+              with open("alteracoes_hoje.txt", "w", encoding="utf-8") as f:
+                  f.write("\n".join(atual) + "\n")
+
+
+          if motivo:
+              shutil.copy("folha.csv", "properties.csv")
+              with open("fonte.txt", "w", encoding="utf-8") as f:
+                  f.write("folha (backup)")
+              aviso_do_dia([f"{hora} · LEITURA DO SITE FALHOU · {motivo} · lista gerada a partir da folha"])
+              print("FONTE: folha (backup) -", motivo)
+              raise SystemExit(0)
+
+
+          def eur(n):
+              return f"{int(n):,}".replace(",", " ") + " €" if n else ""
+
+
+          # Referencias repetidas no site (ex.: PT03I-0682 tem 3 apartamentos): _A, _B, _C por id
+          # decrescente, igual ao que a folha usava, para as fichas manterem o mesmo endereco.
+          por_ref = {}
+          for p in vendas:
+              por_ref.setdefault(p["ref"].strip(), []).append(p)
+          for ref, grupo in por_ref.items():
+              if len(grupo) > 1:
+                  for k, p in enumerate(sorted(grupo, key=lambda x: int(x["id"] or 0), reverse=True)):
+                      p["ref_lista"] = f"{ref}_{chr(65 + k)}"
+
+          linhas_csv = []
+          for n, p in enumerate(sorted(vendas, key=lambda x: int(x["id"] or 0)), 1):
+              titulo = html.unescape(p.get("titulo") or "").strip()
+              if (p.get("estado") or "").lower() == "reservado":
+                  titulo += " (reservado)"
+              conc, freg = (p.get("concelho") or "").strip(), (p.get("freguesia") or "").strip()
+              local = f"{conc} > {freg}" if conc and freg else (freg or conc or (p.get("distrito") or "").strip() or "Portugal")
+              linhas_csv.append([str(n), p.get("ref_lista") or p["ref"].strip(), titulo, local,
+                                 eur(p.get("preco")), "Venda", p["url"]])
+          # Ficha no site sem referencia: vai como linha sem Reference -> ignoradas.txt (aviso M-042)
+          for p in lidos:
+              if not (p.get("ref") or "").strip() and p.get("negocio") == "Venda":
+                  linhas_csv.append(["", "", html.unescape(p.get("titulo") or ""), p.get("concelho") or "",
+                                     eur(p.get("preco")), "Venda", p["url"]])
+
+          with open("properties.csv", "w", encoding="utf-8", newline="") as f:
+              w = csv.writer(f)
+              w.writerow(CAB)
+              w.writerows(linhas_csv)
+          # folha.json: o que o Make escreve na folha (backup), igual ao properties.csv. E um
+          # ValueRange da API do Google Sheets, enviado tal e qual (sem campos a mais).
+          with open("folha.json", "w", encoding="utf-8") as f:
+              # So linhas completas: a tabela do GHL (sincronizada desta folha) recusa a sincronizacao
+              # INTEIRA se uma linha tiver Reference, Title ou Location vazios (visto a 02/11/2026).
+              completas = [l for l in linhas_csv if l[1] and l[2] and l[3]]
+              json.dump({"majorDimension": "ROWS", "values": [CAB] + completas}, f, ensure_ascii=False)
+          with open("fonte.txt", "w", encoding="utf-8") as f:
+              f.write("site stopandbuy.pt")
+
+          # Base de dados: todos os imoveis lidos (venda e arrendamento), com a data em que apareceram.
+          ant_im = ant.get("imoveis", {})
+          novo_im = {}
+          for p in com_ref:
+              reg = {k: p.get(k, "") for k in ("ref", "titulo", "negocio", "preco", "estado", "natureza",
+                                                "tipologia", "distrito", "concelho", "freguesia", "url")}
+              reg["titulo"] = html.unescape(reg["titulo"] or "")
+              reg["primeira_vez"] = ant_im.get(p["id"], {}).get("primeira_vez", hora)
+              reg["ultima_vez"] = hora
+              novo_im[p["id"]] = reg
+
+          mud = []
+          if ant_im:
+              def desc(r):
+                  return f"{r['ref']} · {r['titulo']} · {eur(r['preco']) or 'sob consulta'} · {r['negocio']} · {r['url']}"
+              for i, r in novo_im.items():
+                  a = ant_im.get(i)
+                  if not a:
+                      mud.append(f"{hora} · NOVO · {desc(r)}")
+                      continue
+                  if a.get("preco") != r["preco"]:
+                      mud.append(f"{hora} · PREÇO {eur(a.get('preco')) or 'sob consulta'} → {eur(r['preco']) or 'sob consulta'} · {desc(r)}")
+                  if (a.get("estado") or "") != (r["estado"] or ""):
+                      mud.append(f"{hora} · ESTADO {a.get('estado') or '—'} → {r['estado'] or '—'} · {desc(r)}")
+                  if a.get("ref") != r["ref"]:
+                      mud.append(f"{hora} · REFERÊNCIA {a.get('ref')} → {r['ref']} · {desc(r)}")
+              for i, a in ant_im.items():
+                  if i not in novo_im:
+                      mud.append(f"{hora} · RETIRADO DO SITE · {desc(a)}")
+          else:
+              mud.append(f"{hora} · PRIMEIRA LEITURA DO SITE · {len(vendas)} à venda, {len(com_ref) - len(vendas)} para arrendar")
+          if mud:
+              aviso_do_dia(mud)
+
+          os.makedirs("dados", exist_ok=True)
+          with open("dados/imoveis.json", "w", encoding="utf-8") as f:
+              json.dump({"atualizado": hora, "fonte": "site stopandbuy.pt", "total_venda": len(vendas),
+                         "total": len(com_ref), "imoveis": novo_im}, f, ensure_ascii=False, indent=1, sort_keys=True)
+          print(f"FONTE: site - {len(vendas)} a venda, {len(com_ref) - len(vendas)} para arrendar, {len(mud)} alteracoes")
+          EOF
 
       - name: Gerar HTML
         run: |
@@ -117,7 +354,7 @@ jobs:
               if not parts:
                   return "", ""
               conc = CONCELHOS.get(parts[0].lower(), "") if len(parts) > 1 else ""
-              conc = conc or CONCELHOS.get(parts[-1].lower(), "")
+              conc = conc or CONCELHOS.get(parts[-1].lower(), "") or (parts[0] if len(parts) > 1 else "")
               return conc, REGIOES.get(conc, "")
 
           def preco_num(p):
@@ -221,6 +458,7 @@ jobs:
           with open("ignoradas.txt", "w", encoding="utf-8") as f:
               f.write("".join(l + "\n" for l in linhas_ign))
           aviso_ign = f" | Linhas da folha sem referência: {len(ignoradas)}" if ignoradas else ""
+          fonte = open("fonte.txt", encoding="utf-8").read().strip() if os.path.exists("fonte.txt") else "folha"
 
           index = f"""<!DOCTYPE html>
           <html lang="pt"><head><meta charset="UTF-8">
@@ -228,7 +466,7 @@ jobs:
           <style>{CSS}</style>
           </head><body>
           <h1>Stop And Buy - Imóveis Disponíveis</h1>
-          <p class="update">Atualizado: {now} | Total: {len(rows)} imóveis{aviso_ign}</p>
+          <p class="update">Atualizado: {now} | Total: {len(rows)} imóveis{aviso_ign} | Fonte: {fonte}</p>
           <p>Cada imóvel tem uma ficha própria, acessível pela sua referência.</p>
           {''.join(index_cards)}
           </body></html>"""
@@ -365,7 +603,7 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add -A index.html 404.html imoveis pesquisa sitemap.xml ignoradas.txt
+          git add -A index.html 404.html imoveis pesquisa sitemap.xml ignoradas.txt dados folha.json alteracoes_hoje.txt
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
