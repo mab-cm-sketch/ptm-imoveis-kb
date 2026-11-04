@@ -265,7 +265,7 @@ jobs:
         run: |
           python3 << 'EOF'
           import csv, html, json, os, re, shutil
-          from datetime import datetime
+          from datetime import datetime, timedelta
           from zoneinfo import ZoneInfo
 
           rows = []
@@ -660,9 +660,11 @@ jobs:
               f.write(sitemap)
 
           # kb_novos.txt: paginas publicadas pela 1.a vez, para entrarem na knowledge base do GHL.
-          # dados/kb_urls.json guarda todos os URLs ja publicados (activos e retirados). O Make
-          # 10074461 le o kb_novos.txt as 21:30 e acrescenta cada URL a KB pela API (modo Exact).
-          # Acumulado no dia de Lisboa, como o alteracoes_hoje.txt. Na 1.a corrida so regista.
+          # dados/kb_urls.json guarda todos os URLs ja publicados (activos e retirados). Uma linha
+          # por URL novo, "AAAA-MM-DD URL" (dia de Lisboa da corrida que o publicou), ultimos 7 dias.
+          # O Make 10074461 corre as 21:30 e acrescenta a KB (API, modo Exact) so as linhas de ONTEM:
+          # o dia de ontem ja esta fechado, por isso nenhuma corrida atrasada fica de fora e cada
+          # URL e enviado uma unica vez. Na 1.a corrida so regista.
           os.makedirs("dados", exist_ok=True)
           REG = "dados/kb_urls.json"
           publicados = set(urls) | {BASE + "imoveis/" + n for n in os.listdir("imoveis")} \
@@ -675,15 +677,25 @@ jobs:
               conhecidos, novos = set(), []
           with open(REG, "w", encoding="utf-8") as f:
               json.dump({"atualizado": now, "urls": sorted(conhecidos | publicados)}, f, ensure_ascii=False, indent=1)
-          kb = []
+          desde = (agora - timedelta(days=6)).strftime("%Y-%m-%d")
+          kb, dia_antigo = [], hoje
           if os.path.exists("kb_novos.txt"):
               with open("kb_novos.txt", encoding="utf-8") as f:
-                  kb = f.read().splitlines()
-          if not kb or kb[0] != "Data: " + hoje:
-              kb = ["Data: " + hoje]
-          kb += [u for u in novos if u not in kb]
+                  for l in f.read().splitlines():
+                      l = l.strip()
+                      if l.startswith("Data: "):          # formato antigo (um dia por ficheiro)
+                          dia_antigo = l[6:16]
+                      elif l.startswith("https://"):      # formato antigo: URL sem data
+                          kb.append((dia_antigo, l))
+                      elif re.match(r"\d{4}-\d{2}-\d{2} https://", l):
+                          d, u = l.split(" ", 1)
+                          kb.append((d, u.strip()))
+          ja = {u for _, u in kb}
+          kb += [(hoje, u) for u in novos if u not in ja]
+          kb = [(d, u) for d, u in kb if d >= desde]
           with open("kb_novos.txt", "w", encoding="utf-8") as f:
-              f.write("\n".join(kb) + "\n")
+              f.write(f"# Paginas novas para a knowledge base (ultimos 7 dias) | Atualizado: {now}\n")
+              f.write("".join(f"{d} {u}\n" for d, u in kb))
 
           # 404: uma referencia que nao exista aterra aqui, em vez de dar erro cru
           nao_encontrado = f"""<!DOCTYPE html>
