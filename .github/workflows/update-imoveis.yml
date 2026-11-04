@@ -264,8 +264,9 @@ jobs:
       - name: Gerar HTML
         run: |
           python3 << 'EOF'
-          import csv, html, os, re, shutil
-          from datetime import datetime, timezone, timedelta
+          import csv, html, json, os, re, shutil
+          from datetime import datetime
+          from zoneinfo import ZoneInfo
 
           rows = []
           ignoradas = []   # M-042: linhas com dados mas sem referencia ficam fora da lista
@@ -276,7 +277,30 @@ jobs:
                   elif any((row.get(k) or "").strip() for k in ("Title", "URL", "Price")):
                       ignoradas.append(row)
 
-          now = datetime.now(timezone(timedelta(hours=1))).strftime("%Y-%m-%d %H:%M")
+          # Hora de Lisboa (o UTC+1 fixo adiantava 1 h no inverno)
+          agora = datetime.now(ZoneInfo("Europe/Lisbon"))
+          now = agora.strftime("%Y-%m-%d %H:%M")
+          hoje = agora.strftime("%Y-%m-%d")
+          fonte = open("fonte.txt", encoding="utf-8").read().strip() if os.path.exists("fonte.txt") else "folha"
+          # So com a lista lida do site se da um imovel como retirado. Com a folha (backup) as
+          # paginas antigas ficam como estao: a folha pode estar atrasada.
+          lista_do_site = fonte.startswith("site")
+
+
+          def ler_antigas(pasta):
+              # Paginas publicadas na corrida anterior, lidas ANTES de a pasta ser limpa.
+              out = {}
+              if os.path.isdir(pasta):
+                  for nome in sorted(os.listdir(pasta)):
+                      if nome.endswith(".html"):
+                          with open(os.path.join(pasta, nome), encoding="utf-8") as f:
+                              out[nome] = f.read()
+              return out
+
+
+          def titulo_antigo(doc):
+              m = re.search(r"<title>(.*?)\s*\|\s*Stop And Buy</title>", doc, re.S)
+              return html.unescape(m.group(1)).strip() if m else ""
 
           CSS = ("body{font-family:Arial,sans-serif;margin:20px;max-width:820px}"
                  "h1{color:#2c3e50}h2{color:#2c3e50;font-size:1.15em}"
@@ -287,7 +311,8 @@ jobs:
                  ".ref{font-weight:bold;color:#e67e22}"
                  ".price{font-weight:bold;color:#27ae60;font-size:1.1em}a{color:#2980b9}")
 
-          # pasta limpa para as paginas individuais
+          # pasta limpa para as paginas individuais (as antigas ficam em memoria: ver RETIRADAS)
+          antigas_imoveis = ler_antigas("imoveis")
           if os.path.isdir("imoveis"):
               shutil.rmtree("imoveis")
           os.makedirs("imoveis", exist_ok=True)
@@ -458,7 +483,48 @@ jobs:
           with open("ignoradas.txt", "w", encoding="utf-8") as f:
               f.write("".join(l + "\n" for l in linhas_ign))
           aviso_ign = f" | Linhas da folha sem referência: {len(ignoradas)}" if ignoradas else ""
-          fonte = open("fonte.txt", encoding="utf-8").read().strip() if os.path.exists("fonte.txt") else "folha"
+
+          # RETIRADAS (C-018, 04/11/2026): a ficha de um imovel que saiu do site NAO e apagada.
+          # O GHL nao larga da knowledge base uma pagina que passa a dar 404: fica com o texto antigo
+          # e o bot continua a oferecer o imovel. Com a ficha trocada por um aviso, o refresh diario
+          # do GHL substitui o texto. A ficha retirada nao entra no indice nem no sitemap; se o imovel
+          # voltar ao site, a ficha normal volta a ser escrita por cima.
+          MARCA_RETIRADA = "<!-- ficha-retirada -->"
+          retiradas_hoje = []
+          # Travao: so se retiram fichas com a lista do site E se a lista nao encolheu de repente
+          # (menos de 20 imoveis ou menos de 70 % das fichas activas da corrida anterior).
+          ativas_antes = sum(1 for d in antigas_imoveis.values() if MARCA_RETIRADA not in d)
+          pode_retirar = lista_do_site and len(rows) >= 20 and len(rows) >= 0.7 * ativas_antes
+          if lista_do_site and not pode_retirar:
+              print(f"AVISO: lista com {len(rows)} imoveis para {ativas_antes} fichas activas - nenhuma ficha retirada")
+          for nome, doc in antigas_imoveis.items():
+              caminho = os.path.join("imoveis", nome)
+              if os.path.exists(caminho):
+                  continue                      # o imovel continua (ou voltou) a lista
+              if not pode_retirar or MARCA_RETIRADA in doc:
+                  with open(caminho, "w", encoding="utf-8") as f:
+                      f.write(doc)              # backup da folha, ou aviso ja feito: fica igual
+                  continue
+              ref_r = nome[:-5]
+              antigo = titulo_antigo(doc)
+              if antigo.startswith(ref_r + " - "):
+                  antigo = antigo[len(ref_r) + 3:]
+              e = html.escape
+              aviso = f"""<!DOCTYPE html>
+          <html lang="pt"><head><meta charset="UTF-8">
+          {MARCA_RETIRADA}
+          <meta name="robots" content="noindex">
+          <title>{e(ref_r)} - IMÓVEL INDISPONÍVEL (vendido ou retirado) | Stop And Buy</title>
+          <style>{CSS}</style>
+          </head><body>
+          <h1>{e(ref_r)} - IMÓVEL INDISPONÍVEL</h1>
+          <p>O imóvel com a referência <span class="ref">{e(ref_r)}</span>{(" (" + e(antigo) + ")") if antigo else ""} já não está à venda na Stop And Buy: foi vendido ou retirado do mercado ({hoje}).</p>
+          <p>Não faz parte da lista de imóveis disponíveis: não tem preço, link nem visitas.</p>
+          <p><a href="../index.html">Ver os imóveis disponíveis</a></p>
+          </body></html>"""
+              with open(caminho, "w", encoding="utf-8") as f:
+                  f.write(aviso)
+              retiradas_hoje.append(ref_r)
 
           index = f"""<!DOCTYPE html>
           <html lang="pt"><head><meta charset="UTF-8">
@@ -478,6 +544,7 @@ jobs:
           # Alentejana" nunca encontra as fichas certas uma a uma. Uma pagina pequena por
           # faixa de preco e por concelho da ao bot a lista inteira que responde ao criterio.
           # Faixas SOBREPOSTAS de proposito: um orcamento perto do limite cai em duas.
+          antigas_pesquisa = ler_antigas("pesquisa")
           if os.path.isdir("pesquisa"):
               shutil.rmtree("pesquisa")
           os.makedirs("pesquisa", exist_ok=True)
@@ -569,16 +636,54 @@ jobs:
                                 "(Porto Covo, Vila Nova de Milfontes, Santo André, Cercal, São Luís, São Teotónio), "
                                 "do mais barato para o mais caro.", litoral))
 
-          # sitemap.xml: e o que permite ao rastreador do GHL descobrir sozinho as
-          # fichas individuais. Sem ele o rastreador so treina a pagina que lhe
-          # derem, e um imovel novo fica invisivel para a knowledge base.
+          # Pesquisas que deixaram de ter imoveis (ex.: concelho-portimao.html a 03/11): pelo mesmo
+          # motivo das fichas, a pagina fica, sem imoveis, em vez de dar 404. Fora do sitemap.
+          for nome, doc in antigas_pesquisa.items():
+              caminho = os.path.join("pesquisa", nome)
+              if os.path.exists(caminho):
+                  continue
+              if not pode_retirar or "Total: 0 imóveis" in doc:
+                  with open(caminho, "w", encoding="utf-8") as f:
+                      f.write(doc)
+                  continue
+              pagina(nome, titulo_antigo(doc) or nome[:-5].replace("-", " "),
+                     "Neste momento a Stop And Buy não tem imóveis à venda nesta pesquisa.", [])
+
+          # sitemap.xml: lista das paginas ACTIVAS (sem fichas retiradas). Nota 04/11/2026: o
+          # rastreador do GHL NAO o usa para descobrir fichas novas (so refresca os URLs que ja
+          # tem) - as novas entram pelo kb_novos.txt, mais abaixo.
           BASE = "https://mab-cm-sketch.github.io/ptm-imoveis-kb/"
-          hoje = datetime.now(timezone(timedelta(hours=1))).strftime("%Y-%m-%d")
           urls = [BASE] + [f"{BASE}imoveis/{re.sub(r'[^A-Za-z0-9-]', '', (r.get('Reference') or '').strip()) or 'sem-ref'}.html" for r in rows] + [BASE + p for p in paginas]
           linhas = [f"  <url><loc>{html.escape(u)}</loc><lastmod>{hoje}</lastmod></url>" for u in urls]
           sitemap = chr(10).join(['<?xml version="1.0" encoding="UTF-8"?>', '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">'] + linhas + ['</urlset>', ''])
           with open("sitemap.xml", "w", encoding="utf-8") as f:
               f.write(sitemap)
+
+          # kb_novos.txt: paginas publicadas pela 1.a vez, para entrarem na knowledge base do GHL.
+          # dados/kb_urls.json guarda todos os URLs ja publicados (activos e retirados). O Make
+          # 10074461 le o kb_novos.txt as 21:30 e acrescenta cada URL a KB pela API (modo Exact).
+          # Acumulado no dia de Lisboa, como o alteracoes_hoje.txt. Na 1.a corrida so regista.
+          os.makedirs("dados", exist_ok=True)
+          REG = "dados/kb_urls.json"
+          publicados = set(urls) | {BASE + "imoveis/" + n for n in os.listdir("imoveis")} \
+                       | {BASE + "pesquisa/" + n for n in os.listdir("pesquisa")}
+          if os.path.exists(REG):
+              with open(REG, encoding="utf-8") as f:
+                  conhecidos = set(json.load(f).get("urls", []))
+              novos = sorted(u for u in publicados - conhecidos if u != BASE)
+          else:
+              conhecidos, novos = set(), []
+          with open(REG, "w", encoding="utf-8") as f:
+              json.dump({"atualizado": now, "urls": sorted(conhecidos | publicados)}, f, ensure_ascii=False, indent=1)
+          kb = []
+          if os.path.exists("kb_novos.txt"):
+              with open("kb_novos.txt", encoding="utf-8") as f:
+                  kb = f.read().splitlines()
+          if not kb or kb[0] != "Data: " + hoje:
+              kb = ["Data: " + hoje]
+          kb += [u for u in novos if u not in kb]
+          with open("kb_novos.txt", "w", encoding="utf-8") as f:
+              f.write("\n".join(kb) + "\n")
 
           # 404: uma referencia que nao exista aterra aqui, em vez de dar erro cru
           nao_encontrado = f"""<!DOCTYPE html>
@@ -595,7 +700,9 @@ jobs:
           with open("404.html", "w", encoding="utf-8") as f:
               f.write(nao_encontrado)
 
-          print(f"Gerado index.html + 404.html + {len(rows)} fichas em imoveis/ + {len(paginas)} paginas em pesquisa/")
+          print(f"Gerado index.html + 404.html + {len(rows)} fichas em imoveis/ + {len(paginas)} paginas em pesquisa/"
+                f" | fichas retiradas nesta corrida: {', '.join(retiradas_hoje) or 'nenhuma'}"
+                f" | URLs novos para a KB: {len(novos)}")
           EOF
 
       - name: Commit e push
@@ -603,7 +710,7 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add -A index.html 404.html imoveis pesquisa sitemap.xml ignoradas.txt dados folha.json alteracoes_hoje.txt
+          git add -A index.html 404.html imoveis pesquisa sitemap.xml ignoradas.txt dados folha.json alteracoes_hoje.txt kb_novos.txt
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
