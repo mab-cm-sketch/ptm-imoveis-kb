@@ -225,7 +225,7 @@ jobs:
           novo_im = {}
           for p in com_ref:
               reg = {k: p.get(k, "") for k in ("ref", "titulo", "negocio", "preco", "estado", "natureza",
-                                                "tipologia", "distrito", "concelho", "freguesia", "url")}
+                                                "tipologia", "distrito", "concelho", "freguesia", "url", "lat", "lng")}
               reg["titulo"] = html.unescape(reg["titulo"] or "")
               reg["primeira_vez"] = ant_im.get(p["id"], {}).get("primeira_vez", hora)
               reg["ultima_vez"] = hora
@@ -397,6 +397,40 @@ jobs:
 
           index_cards = []
 
+          # Estado e mapa nas fichas (C-019, 05/11/2026): vem de dados/imoveis.json, procurado pelo URL
+          # do anuncio (unico) e, se falhar, pela referencia - so quando a referencia e unica
+          # (PT03I-0682 tem 3 imoveis). Ficam so na ficha: indice e pesquisas nao mudam.
+          base_im = {}
+          if os.path.exists("dados/imoveis.json"):
+              with open("dados/imoveis.json", encoding="utf-8") as f:
+                  base_im = json.load(f).get("imoveis", {})
+          im_por_url = {(v.get("url") or "").strip(): v for v in base_im.values() if (v.get("url") or "").strip()}
+          im_refs = [(v.get("ref") or "").strip() for v in base_im.values()]
+          im_por_ref = {(v.get("ref") or "").strip(): v for v in base_im.values() if im_refs.count((v.get("ref") or "").strip()) == 1}
+
+          def coord(v):
+              # Latitude e longitude do JSON-LD do anuncio: so numeros, diferentes de 0
+              try:
+                  la, lo = float((v or {}).get("lat")), float((v or {}).get("lng"))
+              except (TypeError, ValueError):
+                  return None
+              if not (-90 <= la <= 90 and -180 <= lo <= 180) or la == 0 or lo == 0:
+                  return None
+              return round(la, 6), round(lo, 6)
+
+          # A mesma coordenada em 3 ou mais imoveis e um valor por defeito (ex.: morada da agencia): sem link
+          conta_coord = {}
+          for v in base_im.values():
+              if coord(v):
+                  conta_coord[coord(v)] = conta_coord.get(coord(v), 0) + 1
+
+          def link_mapa(v):
+              c = coord(v)
+              if not c or conta_coord.get(c, 0) >= 3:
+                  return ""
+              t = lambda x: f"{x:.6f}".rstrip("0").rstrip(".")
+              return f"https://www.google.com/maps?q={t(c[0])},{t(c[1])}"
+
           for r in rows:
               ref = (r.get("Reference") or "").strip()
               title = (r.get("Title") or "").strip()
@@ -432,6 +466,12 @@ jobs:
               if reg:
                   extras.append(f"Região: {e(reg)}")
               linha_extras = ("<p>" + " \u00b7 ".join(extras) + "</p>") if extras else ""
+              im = im_por_url.get(url) or im_por_ref.get(ref)
+              estado = ((im or {}).get("estado") or "").strip()
+              extras_ficha = extras + ([f"Estado: {e(estado)}"] if estado else [])
+              linha_extras_ficha = ("<p>" + " · ".join(extras_ficha) + "</p>") if extras_ficha else ""
+              mapa = link_mapa(im)
+              linha_mapa = (f'<p>Localização aproximada no mapa: <a href="{e(mapa)}">{e(mapa)}</a></p>') if mapa else ""
               # A referencia aparece no title, no h1 e em varias formas no corpo.
               # E o que torna o codigo recuperavel pela pesquisa da knowledge base.
               # A ficha e um REDIRECCIONADOR permanente: a referencia e o URL.
@@ -451,8 +491,8 @@ jobs:
           </head><body>
           <h1>{e(ref)} - {e(title)}</h1>
           <p>Referência: <span class="ref">{e(ref)}</span> · {e(local)} · <span class="price">{e(price)}</span> · {e(tipo)}</p>
-          {linha_extras}
-          {destino}
+          {linha_extras_ficha}
+          {destino}{linha_mapa}
           <hr>
           <p><a href="../index.html">Todos os imóveis Stop And Buy</a></p>
           </body></html>"""
@@ -697,6 +737,47 @@ jobs:
               f.write(f"# Paginas novas para a knowledge base (ultimos 7 dias) | Atualizado: {now}\n")
               f.write("".join(f"{d} {u}\n" for d, u in kb))
 
+          # arrendamento.html (C-019, 05/11/2026): imoveis para ARRENDAR, a partir de dados/imoveis.json.
+          # Na raiz do site, fora de imoveis/ e pesquisa/: nao entra no kb_novos.txt, no sitemap nem no
+          # indice (a knowledge base dos compradores nao a recebe). Com a folha (backup) fica a ultima
+          # versao; so se escreve com a lista do site (ou se ainda nao existir). Nunca e apagada.
+          if lista_do_site or not os.path.exists("arrendamento.html"):
+              e = html.escape
+              arr = sorted([v for v in base_im.values() if v.get("negocio") == "Arrendamento"],
+                           key=lambda v: (v.get("ref") or ""))
+              blocos = []
+              for v in arr:
+                  try:
+                      renda = int(float(v.get("preco") or 0))
+                  except (TypeError, ValueError):
+                      renda = 0
+                  txt_renda = (f"{renda:,}".replace(",", " ") + " €/mês") if renda else "renda sob consulta"
+                  carac = " · ".join(x for x in ((v.get("tipologia") or "").strip(), (v.get("natureza") or "").strip(),
+                                                     (v.get("estado") or "").strip()) if x)
+                  sitio = ", ".join(x for x in ((v.get("freguesia") or "").strip(), (v.get("concelho") or "").strip()) if x)
+                  anuncio = (v.get("url") or "").strip()
+                  mapa = link_mapa(v)
+                  blocos.append(
+                      f'<div class="property"><h2>{e(v.get("ref") or "")} - {e(html.unescape(v.get("titulo") or ""))}</h2>'
+                      f'<p>Renda: <span class="price">{e(txt_renda)}</span></p>'
+                      + (f'<p>{e(carac)}</p>' if carac else "")
+                      + (f'<p>Local: {e(sitio)}</p>' if sitio else "")
+                      + (f'<p>Anúncio: <a href="{e(anuncio)}">{e(anuncio)}</a></p>' if anuncio else "")
+                      + (f'<p>Localização aproximada no mapa: <a href="{e(mapa)}">{e(mapa)}</a></p>' if mapa else "")
+                      + "</div>")
+              corpo = "".join(blocos) if blocos else "<p>Neste momento não há imóveis para arrendar no site.</p>"
+              with open("arrendamento.html", "w", encoding="utf-8") as f:
+                  f.write(f"""<!DOCTYPE html>
+          <html lang="pt"><head><meta charset="UTF-8">
+          <title>Imóveis para ARRENDAR — Stop And Buy (não estão à venda)</title>
+          <style>{CSS}</style>
+          </head><body>
+          <h1>Imóveis para ARRENDAR — Stop And Buy (não estão à venda)</h1>
+          <p class="update">Atualizado: {now}</p>
+          {corpo}
+          </body></html>""")
+              print(f"arrendamento.html: {len(arr)} imoveis para arrendar")
+
           # 404: uma referencia que nao exista aterra aqui, em vez de dar erro cru
           nao_encontrado = f"""<!DOCTYPE html>
           <html lang="pt"><head><meta charset="UTF-8">
@@ -722,7 +803,7 @@ jobs:
         run: |
           git config user.name "GitHub Action"
           git config user.email "action@github.com"
-          git add -A index.html 404.html imoveis pesquisa sitemap.xml ignoradas.txt dados folha.json alteracoes_hoje.txt kb_novos.txt
+          git add -A index.html 404.html imoveis pesquisa sitemap.xml ignoradas.txt dados folha.json alteracoes_hoje.txt kb_novos.txt arrendamento.html
           if git diff --cached --quiet; then
             echo "changed=false" >> $GITHUB_OUTPUT
           else
