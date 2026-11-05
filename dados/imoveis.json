@@ -1,5 +1,5 @@
 {
- "atualizado": "2026-11-05 04:29",
+ "atualizado": "2026-11-05 11:10",
  "fonte": "site stopandbuy.pt",
  "imoveis": {
   "19530741": {
@@ -7,6 +7,8 @@
    "distrito": "Beja",
    "estado": "Usado",
    "freguesia": "Colos",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 700000,
@@ -14,7 +16,7 @@
    "ref": "PT03Q-0034",
    "tipologia": "",
    "titulo": "Herdade em Colos 38ha",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/herdade-em-colos-38ha/19530741"
   },
   "19565977": {
@@ -22,6 +24,8 @@
    "distrito": "Beja",
    "estado": "Usado",
    "freguesia": "São Luís",
+   "lat": "",
+   "lng": "",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 620000,
@@ -29,7 +33,7 @@
    "ref": "PT03T-0016",
    "tipologia": "",
    "titulo": "Rústico 53ha",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/rustico-53ha/19565977"
   },
   "19565978": {
@@ -37,6 +41,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Cercal",
+   "lat": "",
+   "lng": "",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 736000,
@@ -44,7 +50,7 @@
    "ref": "PT03T-0015",
    "tipologia": "",
    "titulo": "Terreno Rústico com 66ha Cercal do Alentejo",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/terreno-rustico-com-66ha-cercal-do-alentejo/19565978"
   },
   "19565979": {
@@ -52,6 +58,8 @@
    "distrito": "Beja",
    "estado": "Usado",
    "freguesia": "São Luís",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 975000,
@@ -59,7 +67,7 @@
    "ref": "PT03Q-0039",
    "tipologia": "",
    "titulo": "Herdade com 71ha",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/herdade-com-71ha/19565979"
   },
   "19635998": {
@@ -67,6 +75,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Vale de Água",
+   "lat": "37.90534367914096",
+   "lng": "-8.64291549485643",
    "natureza": "Herdade",
    "negocio": "Venda",
    "preco": 3600000,
@@ -74,7 +84,7 @@
    "ref": "PT03Q-0042",
    "tipologia": "T17",
    "titulo": "Herdade 8,5ha Vale das Éguas",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/herdade-85ha-vale-das-eguas/19635998"
   },
   "19842746": {
@@ -82,6 +92,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Grândola e Santa Margarida da Serra",
+   "lat": "38.21485180000000",
+   "lng": "-8.43521270000000",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 950000,
@@ -89,7 +101,7 @@
    "ref": "PT03Q-0038",
    "tipologia": "T7",
    "titulo": "Monte alentejano 8,2ha Grândola",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/monte-alentejano-82ha-grandola/19842746"
   },
   "20212294": {
@@ -97,6 +109,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Abela",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 200000,
@@ -104,7 +118,7 @@
    "ref": "PT03Q-0016",
    "tipologia": "",
    "titulo": "Quinta com 3 ha - viva no campo sem abdicar da cidade",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-com-3-ha-viva-no-campo-sem-abdicar-da-cidade/20212294"
   },
   "20219812": {
@@ -112,6 +126,8 @@
    "distrito": "Beja",
    "estado": "Usado",
    "freguesia": "Messejana",
+   "lat": "",
+   "lng": "",
    "natureza": "Herdade",
    "negocio": "Venda",
    "preco": 2250000,
@@ -119,7 +135,7 @@
    "ref": "PT03Q-0017",
    "tipologia": "T4",
    "titulo": "Magnifica Herdade com exploração agrícola Messejana",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/magnifica-herdade-com-exploracao-agricola-messejana/20219812"
   },
   "20249224": {
@@ -127,6 +143,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 390000,
@@ -134,7 +152,7 @@
    "ref": "PT03Q-0011",
    "tipologia": "T1",
    "titulo": "Quinta com 14ha São Bartolomeu da Serra",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-com-14ha-sao-bartolomeu-da-serra/20249224"
   },
   "20411107": {
@@ -142,6 +160,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Grândola e Santa Margarida da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 235000,
@@ -149,7 +169,7 @@
    "ref": "PT03T-0023",
    "tipologia": "",
    "titulo": "Terreno Rústico com 13,5ha Santa Margarida da Serra",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/terreno-rustico-com-135ha-santa-margarida-da-serra/20411107"
   },
   "20645528": {
@@ -157,6 +177,8 @@
    "distrito": "Beja",
    "estado": "Por recuperar",
    "freguesia": "São Teotónio",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 135000,
@@ -164,7 +186,7 @@
    "ref": "PT03Q-0060",
    "tipologia": "T4",
    "titulo": "Quinta São Teotónio com 9,7ha",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-sao-teotonio-com-97ha/20645528"
   },
   "20901159": {
@@ -172,6 +194,8 @@
    "distrito": "Beja",
    "estado": "Usado",
    "freguesia": "Santa Cruz",
+   "lat": "",
+   "lng": "",
    "natureza": "Herdade",
    "negocio": "Venda",
    "preco": 8500000,
@@ -179,7 +203,7 @@
    "ref": "PT03Q-0035",
    "tipologia": "",
    "titulo": "Herdade com 537ha Loule/Almôdovar",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/herdade-com-537ha-loulealmodovar/20901159"
   },
   "20904851": {
@@ -187,6 +211,8 @@
    "distrito": "Setúbal",
    "estado": "Reservado",
    "freguesia": "Abela",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 140000,
@@ -194,7 +220,7 @@
    "ref": "PT03Q-0040",
    "tipologia": "T1",
    "titulo": "Quinta com 7500m2",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-com-7500m2/20904851"
   },
   "21228136": {
@@ -202,6 +228,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Estúdio",
    "negocio": "Arrendamento",
    "preco": 850,
@@ -209,7 +237,7 @@
    "ref": "PT03A-0449",
    "tipologia": "",
    "titulo": "Estúdio T0 Santiago do Cacém",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/estudio-t0-santiago-do-cacem/21228136"
   },
   "21378403": {
@@ -217,6 +245,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "São Francisco da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 250000,
@@ -224,7 +254,7 @@
    "ref": "PT03Q-0025",
    "tipologia": "",
    "titulo": "Quinta 10ha Roncão Santiago do Cacém",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-10ha-roncao-santiago-do-cacem/21378403"
   },
   "21519196": {
@@ -232,6 +262,8 @@
    "distrito": "Beja",
    "estado": "Usado",
    "freguesia": "São Teotónio",
+   "lat": "",
+   "lng": "",
    "natureza": "Herdade",
    "negocio": "Venda",
    "preco": 5000000,
@@ -239,7 +271,7 @@
    "ref": "PT03Q-0067",
    "tipologia": "",
    "titulo": "Herdade Regadio 101ha Odemira",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/herdade-regadio-101ha-odemira/21519196"
   },
   "21562003": {
@@ -247,6 +279,8 @@
    "distrito": "Beja",
    "estado": "Não Aplicável",
    "freguesia": "Colos",
+   "lat": "",
+   "lng": "",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 230000,
@@ -254,7 +288,7 @@
    "ref": "PT03T-0477",
    "tipologia": "",
    "titulo": "Terreno Rústico 23ha Colos - Odemira",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/terreno-rustico-23ha-colos-odemira/21562003"
   },
   "21686293": {
@@ -262,6 +296,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Vale de Água",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 950000,
@@ -269,7 +305,7 @@
    "ref": "PT03Q-0057",
    "tipologia": "T3",
    "titulo": "QUINTA DE 11 HA COM PROJETO DE TURISMO RURAL APROVADO, A 500 M DA BARRAGEM DE CAMPILHAS",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-de-11-ha-com-projeto-de-turismo-rural-aprovado-a-500-m-da-barragem-de-campilhas/21686293"
   },
   "21689490": {
@@ -277,6 +313,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Cercal",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 900000,
@@ -284,7 +322,7 @@
    "ref": "PT03Q-0498",
    "tipologia": "T2",
    "titulo": "Quinta 38ha com projeto turismo Sonega",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-38ha-com-projeto-turismo-sonega/21689490"
   },
   "21696588": {
@@ -292,6 +330,8 @@
    "distrito": "Setúbal",
    "estado": "Não Aplicável",
    "freguesia": "São Francisco da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 349000,
@@ -299,7 +339,7 @@
    "ref": "PT03T-0500",
    "tipologia": "",
    "titulo": "Terreno Rústico em São Francisco da Serra",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/terreno-rustico-em-sao-francisco-da-serra/21696588"
   },
   "21731058": {
@@ -307,6 +347,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Bloco de apartamentos",
    "negocio": "Venda",
    "preco": 474000,
@@ -314,7 +356,7 @@
    "ref": "PT03I-0520",
    "tipologia": "",
    "titulo": "Oportunidade de investimento Santiago do Cacém",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/oportunidade-de-investimento-santiago-do-cacem/21731058"
   },
   "22596802": {
@@ -322,6 +364,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "São Francisco da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 960000,
@@ -329,7 +373,7 @@
    "ref": "PT03Q-0525",
    "tipologia": "",
    "titulo": "Quinta 5.5ha S Francisco da Serra",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-55ha-s-francisco-da-serra/22596802"
   },
   "22835972": {
@@ -337,6 +381,8 @@
    "distrito": "Beja",
    "estado": "Usado",
    "freguesia": "São Luís",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 210000,
@@ -344,7 +390,7 @@
    "ref": "PT03Q-0530",
    "tipologia": "T2",
    "titulo": "Quinta em Troviscais - Oportunidade Única no Coração do Alentejo",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-em-troviscais-oportunidade-unica-no-coracao-do-alentejo/22835972"
   },
   "23088770": {
@@ -352,6 +398,8 @@
    "distrito": "Beja",
    "estado": "Usado",
    "freguesia": "São Luís",
+   "lat": "",
+   "lng": "",
    "natureza": "Moradia",
    "negocio": "Venda",
    "preco": 199000,
@@ -359,7 +407,7 @@
    "ref": "PT03M-0529",
    "tipologia": "T3",
    "titulo": "Moradia T3 em Troviscais - Entre a Natureza e o Mar",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/moradia-t3-em-troviscais-entre-a-natureza-e-o-mar/23088770"
   },
   "23088807": {
@@ -367,6 +415,8 @@
    "distrito": "Beja",
    "estado": "Usado",
    "freguesia": "São Luís",
+   "lat": "",
+   "lng": "",
    "natureza": "Comercial",
    "negocio": "Venda",
    "preco": 175000,
@@ -374,7 +424,7 @@
    "ref": "PT03C-0580",
    "tipologia": "T5 Duplex",
    "titulo": "Comércio e moradia em área muito tranquila, próximo ao campo e ao mar",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/comercio-e-moradia-em-area-muito-tranquila-proximo-ao-campo-e-ao-mar/23088807"
   },
   "23317306": {
@@ -382,6 +432,8 @@
    "distrito": "Setúbal",
    "estado": "Por recuperar",
    "freguesia": "Porto Covo",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 820000,
@@ -389,7 +441,7 @@
    "ref": "PT03Q-0744",
    "tipologia": "",
    "titulo": "Quinta 7,5ha Porto Covo",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-75ha-porto-covo/23317306"
   },
   "23381120": {
@@ -397,6 +449,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Sines",
+   "lat": "37.99230143990531",
+   "lng": "-8.79581476000563",
    "natureza": "Herdade",
    "negocio": "Venda",
    "preco": 2000000,
@@ -404,7 +458,7 @@
    "ref": "PT03Q-0591",
    "tipologia": "T5",
    "titulo": "Herdade de 78 Hectares em Sines - Junto à Barragem de Morgavel",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/herdade-de-78-hectares-em-sines-junto-a-barragem-de-morgavel/23381120"
   },
   "23456133": {
@@ -412,6 +466,8 @@
    "distrito": "Beja",
    "estado": "Usado",
    "freguesia": "São Luís",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 1120000,
@@ -419,7 +475,7 @@
    "ref": "PT03Q-0616",
    "tipologia": "T2",
    "titulo": "Quinta com 12,7ha em São Luís- Troviscais",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-com-127ha-em-sao-luis-troviscais/23456133"
   },
   "23657792": {
@@ -427,6 +483,8 @@
    "distrito": "Beja",
    "estado": "Não Aplicável",
    "freguesia": "Vila Nova de Milfontes",
+   "lat": "",
+   "lng": "",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 650000,
@@ -434,7 +492,7 @@
    "ref": "PT03T-0601",
    "tipologia": "",
    "titulo": "Terreno Rústico Praia do Malhão - Milfontes",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/terreno-rustico-praia-do-malhao-milfontes/23657792"
   },
   "23828747": {
@@ -442,6 +500,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "São Domingos",
+   "lat": "",
+   "lng": "",
    "natureza": "Herdade",
    "negocio": "Venda",
    "preco": 2649000,
@@ -449,7 +509,7 @@
    "ref": "PT03Q-0656",
    "tipologia": "T1",
    "titulo": "Herdade Barragem de Campilhas com 157ha",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/herdade-barragem-de-campilhas-com-157ha/23828747"
   },
   "23928997": {
@@ -457,6 +517,8 @@
    "distrito": "Setúbal",
    "estado": "Por recuperar",
    "freguesia": "Vale de Água",
+   "lat": "",
+   "lng": "",
    "natureza": "Moradia",
    "negocio": "Venda",
    "preco": 220000,
@@ -464,7 +526,7 @@
    "ref": "PT03M-0661",
    "tipologia": "T2+2",
    "titulo": "Moradia T2+2 com grande potencial no coração do Alentejo Litoral - Vale de Água\n",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/moradia-t22-com-grande-potencial-no-coracao-do-alentejo-litoral-vale-de-agua/23928997"
   },
   "24138284": {
@@ -472,6 +534,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "São Francisco da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 360000,
@@ -479,7 +543,7 @@
    "ref": "PT03Q-0559",
    "tipologia": "",
    "titulo": "Quinta com Ruína em Santiago do Cacém",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-com-ruina-em-santiago-do-cacem/24138284"
   },
   "24138290": {
@@ -487,6 +551,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 300000,
@@ -494,7 +560,7 @@
    "ref": "PT03T-0586",
    "tipologia": "",
    "titulo": "Quinta com 12,9 ha - Potencial para Habitação e Turismo Rural",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-com-129-ha-potencial-para-habitacao-e-turismo-rural/24138290"
   },
   "24566810": {
@@ -502,6 +568,8 @@
    "distrito": "Setúbal",
    "estado": "Em projecto",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "38.01774000000000",
+   "lng": "-8.61642000000000",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 2900000,
@@ -509,7 +577,7 @@
    "ref": "PT03Q-0676",
    "tipologia": "T1",
    "titulo": "Quinta com Projeto Turístico Aprovado | 40 ha | Santiago do Cacém | Costa Alentejana",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-com-projeto-turistico-aprovado-40-ha-santiago-do-cacem-costa-alentejana/24566810"
   },
   "24626092": {
@@ -517,6 +585,8 @@
    "distrito": "Setúbal",
    "estado": "Em construção",
    "freguesia": "Sines",
+   "lat": "",
+   "lng": "",
    "natureza": "Apartamento",
    "negocio": "Venda",
    "preco": 360000,
@@ -524,7 +594,7 @@
    "ref": "PT03I-0682_C",
    "tipologia": "T2",
    "titulo": "Apartamento T2 - Sines Village",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/apartamento-t2-sines-village/24626092"
   },
   "24626108": {
@@ -532,6 +602,8 @@
    "distrito": "Setúbal",
    "estado": "Em construção",
    "freguesia": "Sines",
+   "lat": "",
+   "lng": "",
    "natureza": "Apartamento",
    "negocio": "Venda",
    "preco": 385000,
@@ -539,7 +611,7 @@
    "ref": "PT03I-0682_B",
    "tipologia": "T3",
    "titulo": "Apartamento T3 - Sines Village",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/apartamento-t3-sines-village/24626108"
   },
   "24626122": {
@@ -547,6 +619,8 @@
    "distrito": "Setúbal",
    "estado": "Em construção",
    "freguesia": "Sines",
+   "lat": "",
+   "lng": "",
    "natureza": "Apartamento",
    "negocio": "Venda",
    "preco": 330000,
@@ -554,7 +628,7 @@
    "ref": "PT03I-0682_A",
    "tipologia": "T2",
    "titulo": "Apartamento T2 - Sines Village",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/apartamento-t2-sines-village/24626122"
   },
   "24798646": {
@@ -562,6 +636,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "São Francisco da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 290000,
@@ -569,7 +645,7 @@
    "ref": "PT03T-0526",
    "tipologia": "",
    "titulo": "Terreno Rústico 4ha S. Francisco da Serra",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/terreno-rustico-4ha-s-francisco-da-serra/24798646"
   },
   "25003011": {
@@ -577,6 +653,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Cercal",
+   "lat": "37.80425000000000",
+   "lng": "-8.67294000000000",
    "natureza": "Moradia",
    "negocio": "Venda",
    "preco": 375000,
@@ -584,7 +662,7 @@
    "ref": "PT03M-0705",
    "tipologia": "T3 Duplex",
    "titulo": "Moradia Espaçosa no Cercal do Alentejo",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/moradia-espacosa-no-cercal-do-alentejo/25003011"
   },
   "25106226": {
@@ -592,6 +670,8 @@
    "distrito": "Setúbal",
    "estado": "Não Aplicável",
    "freguesia": "Sines",
+   "lat": "",
+   "lng": "",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 600000,
@@ -599,7 +679,7 @@
    "ref": "PT03T-0691",
    "tipologia": "",
    "titulo": "Terreno Rústico com Excelente Localização no Litoral Alentejano",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/terreno-rustico-com-excelente-localizacao-no-litoral-alentejano/25106226"
   },
   "25366458": {
@@ -607,6 +687,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Hostel",
    "negocio": "Arrendamento",
    "preco": 0,
@@ -614,7 +696,7 @@
    "ref": "PT03I-0729",
    "tipologia": "T13",
    "titulo": "Imóvel com 13 quartos - Ideal para Alojamento de Empresas",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/imovel-com-13-quartos-ideal-para-alojamento-de-empresas/25366458"
   },
   "25842001": {
@@ -622,6 +704,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "38.01495000000000",
+   "lng": "-8.69602000000000",
    "natureza": "Moradia",
    "negocio": "Venda",
    "preco": 499000,
@@ -629,7 +713,7 @@
    "ref": "PT03M-0540",
    "tipologia": "T4 Duplex",
    "titulo": "Duas Casas, Uma Oportunidade Única",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/duas-casas-uma-oportunidade-unica/25842001"
   },
   "25842619": {
@@ -637,6 +721,8 @@
    "distrito": "Setúbal",
    "estado": "Em projecto",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 1200000,
@@ -644,7 +730,7 @@
    "ref": "PT03T-0731",
    "tipologia": "",
    "titulo": "Herdade com Projeto Turístico Aprovado no Alentejo",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/herdade-com-projeto-turistico-aprovado-no-alentejo/25842619"
   },
   "26074373": {
@@ -652,6 +738,8 @@
    "distrito": "Setúbal",
    "estado": "Por recuperar",
    "freguesia": "Cercal",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 165000,
@@ -659,7 +747,7 @@
    "ref": "PT03Q-0743",
    "tipologia": "T2",
    "titulo": "Terreno com Potencial de Construção a Minutos das Praias da Costa Alentejana e do Cercal do Alentejo",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/terreno-com-potencial-de-construcao-a-minutos-das-praias-da-costa-alentejana-e-do-cercal-do-alentejo/26074373"
   },
   "26076096": {
@@ -667,6 +755,8 @@
    "distrito": "Setúbal",
    "estado": "Em projecto",
    "freguesia": "Vale de Água",
+   "lat": "",
+   "lng": "",
    "natureza": "Terreno Misto",
    "negocio": "Venda",
    "preco": 425000,
@@ -674,7 +764,7 @@
    "ref": "PT03T-0544",
    "tipologia": "",
    "titulo": "Quinta de 2,5 ha em Vale de Água, Alentejo licença aprovada para viver e desfrutar",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-de-25-ha-em-vale-de-agua-alentejo-licenca-aprovada-para-viver-e-desfrutar/26076096"
   },
   "26130765": {
@@ -682,6 +772,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 355000,
@@ -689,7 +781,7 @@
    "ref": "PT03Q-0741",
    "tipologia": "",
    "titulo": "Monte típico Alentejano",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/monte-tipico-alentejano/26130765"
   },
   "26223609": {
@@ -697,6 +789,8 @@
    "distrito": "Setúbal",
    "estado": "Por recuperar",
    "freguesia": "Abela",
+   "lat": "38.00083000000000",
+   "lng": "-8.55630000000000",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 150000,
@@ -704,7 +798,7 @@
    "ref": "PT03Q-0732",
    "tipologia": "",
    "titulo": "Quinta com 6 750 m² em Abela - Natureza, privacidade e potencial",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/quinta-com-6-750-m-em-abela-natureza-privacidade-e-potencial/26223609"
   },
   "26287060": {
@@ -712,6 +806,8 @@
    "distrito": "Beja",
    "estado": "Usado",
    "freguesia": "Aljustrel",
+   "lat": "37.88909000000000",
+   "lng": "-8.16600000000000",
    "natureza": "Herdade",
    "negocio": "Venda",
    "preco": 2400000,
@@ -719,7 +815,7 @@
    "ref": "PT03Q-0706",
    "tipologia": "T7",
    "titulo": "Herdade de Excelência | Um ativo agrícola e equestre de elevado valor no coração do Alentejo",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/herdade-de-excelencia-um-ativo-agricola-e-equestre-de-elevado-valor-no-coracao-do-alentejo/26287060"
   },
   "26398058": {
@@ -727,6 +823,8 @@
    "distrito": "Setúbal",
    "estado": "Por recuperar",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "38.01669000000000",
+   "lng": "-8.61393000000000",
    "natureza": "Herdade",
    "negocio": "Venda",
    "preco": 2350000,
@@ -734,7 +832,7 @@
    "ref": "PT03Q-0748",
    "tipologia": "",
    "titulo": "43,4 Hectares no Alentejo - Um Cenário Único para um Projeto Turístico de Excelência",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/434-hectares-no-alentejo-um-cenario-unico-para-um-projeto-turistico-de-excelencia/26398058"
   },
   "26551860": {
@@ -742,6 +840,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santo André",
+   "lat": "",
+   "lng": "",
    "natureza": "Apartamento",
    "negocio": "Venda",
    "preco": 294000,
@@ -749,7 +849,7 @@
    "ref": "PT03A-0752",
    "tipologia": "T2",
    "titulo": "Apartamento T2 à Venda em Santo André - Junto à Zona Comercial",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/apartamento-t2-a-venda-em-santo-andre-junto-a-zona-comercial/26551860"
   },
   "26558597": {
@@ -757,6 +857,8 @@
    "distrito": "Beja",
    "estado": "Por recuperar",
    "freguesia": "Ourique",
+   "lat": "",
+   "lng": "",
    "natureza": "Quinta",
    "negocio": "Venda",
    "preco": 860000,
@@ -764,7 +866,7 @@
    "ref": "PT03Q-0757",
    "tipologia": "",
    "titulo": "Propriedade Única junto à Barragem de Monte da Rocha - Ourique",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/propriedade-unica-junto-a-barragem-de-monte-da-rocha-ourique/26558597"
   },
   "26571664": {
@@ -772,6 +874,8 @@
    "distrito": "Setúbal",
    "estado": "Renovado",
    "freguesia": "Santo André",
+   "lat": "38.05836000000000",
+   "lng": "-8.78263000000000",
    "natureza": "Apartamento",
    "negocio": "Arrendamento",
    "preco": 1950,
@@ -779,7 +883,7 @@
    "ref": "PT03A-0758",
    "tipologia": "T3",
    "titulo": "Apartamento T3 para Arrendamento",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/apartamento-t3-para-arrendamento/26571664"
   },
   "26583429": {
@@ -787,6 +891,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santo André",
+   "lat": "",
+   "lng": "",
    "natureza": "Andar de Moradia",
    "negocio": "Arrendamento",
    "preco": 2700,
@@ -794,7 +900,7 @@
    "ref": "PT03M-0755",
    "tipologia": "T3",
    "titulo": "Moradia T3 para Arrendamento no Bairro das Flores - Vila Nova de Santo André",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/moradia-t3-para-arrendamento-no-bairro-das-flores-vila-nova-de-santo-andre/26583429"
   },
   "26611669": {
@@ -802,6 +908,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "",
+   "lng": "",
    "natureza": "Apartamento",
    "negocio": "Arrendamento",
    "preco": 1900,
@@ -809,7 +917,7 @@
    "ref": "PT03A-1484",
    "tipologia": "",
    "titulo": "Apartamento T2 Santiago do Cacém",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/apartamento-t2-santiago-do-cacem/26611669"
   },
   "26784952": {
@@ -817,6 +925,8 @@
    "distrito": "Setúbal",
    "estado": "Recuperado",
    "freguesia": "Ermidas-Sado",
+   "lat": "38.00414000000000",
+   "lng": "-8.40985000000000",
    "natureza": "Moradia",
    "negocio": "Venda",
    "preco": 330000,
@@ -824,7 +934,7 @@
    "ref": "PT03M-0766",
    "tipologia": "T4",
    "titulo": "Moradia T4 remodelada com quintal amplo em Ermidas-Sado",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/moradia-t4-remodelada-com-quintal-amplo-em-ermidas-sado/26784952"
   },
   "26789159": {
@@ -832,6 +942,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "38.01808000000000",
+   "lng": "-8.70064000000000",
    "natureza": "Moradia",
    "negocio": "Arrendamento",
    "preco": 3700,
@@ -839,7 +951,7 @@
    "ref": "PT03M-0753",
    "tipologia": "T4",
    "titulo": "Arrendamento para empresas: T2, T1 e estúdio a 5 min de Santiago do Cacém",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/arrendamento-para-empresas-t2-t1-e-estudio-a-5-min-de-santiago-do-cacem/26789159"
   },
   "26798681": {
@@ -847,6 +959,8 @@
    "distrito": "Setúbal",
    "estado": "Não Aplicável",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "38.01737000000000",
+   "lng": "-8.61367000000000",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 144000,
@@ -854,7 +968,7 @@
    "ref": "PT03T-0768",
    "tipologia": "",
    "titulo": "Terreno Rústico 4,9 ha com Montado e Viabilidade para Hotel Rural",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/terreno-rustico-49-ha-com-montado-e-viabilidade-para-hotel-rural/26798681"
   },
   "26827969": {
@@ -862,6 +976,8 @@
    "distrito": "Setúbal",
    "estado": "Usado",
    "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "38.02187000000000",
+   "lng": "-8.69133000000000",
    "natureza": "Apartamento",
    "negocio": "Arrendamento",
    "preco": 2300,
@@ -869,7 +985,7 @@
    "ref": "PT03A-0767",
    "tipologia": "T2",
    "titulo": "T2 mobilado com suite e vista sobre o castelo, no centro de Santiago do Cacém",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/t2-mobilado-com-suite-e-vista-sobre-o-castelo-no-centro-de-santiago-do-cacem/26827969"
   },
   "26842773": {
@@ -877,6 +993,8 @@
    "distrito": "Setúbal",
    "estado": "Não Aplicável",
    "freguesia": "Sines",
+   "lat": "37.86846453580000",
+   "lng": "-8.72115954880000",
    "natureza": "Terreno Rústico",
    "negocio": "Venda",
    "preco": 650000,
@@ -884,10 +1002,27 @@
    "ref": "PT03T-0606",
    "tipologia": "",
    "titulo": "Terreno com vista mar em Sines, vedado e com projeto de hotel rural em aprovação",
-   "ultima_vez": "2026-11-05 04:29",
+   "ultima_vez": "2026-11-05 11:10",
    "url": "https://www.stopandbuy.pt/imovel/terreno-com-vista-mar-em-sines-vedado-e-com-projeto-de-hotel-rural-em-aprovacao/26842773"
+  },
+  "26935828": {
+   "concelho": "Santiago do Cacém",
+   "distrito": "Setúbal",
+   "estado": "Usado",
+   "freguesia": "Santiago do Cacém, S.Cruz e S.Bartolomeu da Serra",
+   "lat": "38.01752000000000",
+   "lng": "-8.69199000000000",
+   "natureza": "Apartamento",
+   "negocio": "Arrendamento",
+   "preco": 3000,
+   "primeira_vez": "2026-11-05 11:10",
+   "ref": "PT03A-0770",
+   "tipologia": "T3",
+   "titulo": "T3 para arrendar no centro de Santiago do Cacém",
+   "ultima_vez": "2026-11-05 11:10",
+   "url": "https://www.stopandbuy.pt/imovel/t3-para-arrendar-no-centro-de-santiago-do-cacem/26935828"
   }
  },
- "total": 59,
+ "total": 60,
  "total_venda": 52
 }
